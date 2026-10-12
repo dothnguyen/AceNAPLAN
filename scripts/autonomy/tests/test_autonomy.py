@@ -88,7 +88,7 @@ class PhaseTests(unittest.TestCase):
         self.assertEqual(len(calls), 2)
         for call in calls:
             self.assertIn("--approve-for-me", call)
-            self.assertEqual(call[call.index("--sandbox") + 1], "workspace-write")
+            self.assertNotIn("--sandbox", call)  # native preset selects workspace-write
             self.assertNotIn("--dangerously-bypass-approvals-and-sandbox", call)
         self.assertIn("resume", calls[1])
         self.assertEqual(calls[1][calls[1].index("resume") + 1], "fixture-session")
@@ -96,6 +96,7 @@ class PhaseTests(unittest.TestCase):
     def test_default_run_does_not_change_approval_routing(self):
         _, calls = self.run_fake(["blocked"])
         self.assertNotIn("--approve-for-me", calls[0])
+        self.assertEqual(calls[0][calls[0].index("--sandbox") + 1], "workspace-write")
 
     def test_init_never_overwrites(self):
         with self.assertRaises(core.GateError):

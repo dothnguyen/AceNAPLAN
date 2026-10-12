@@ -494,9 +494,12 @@ def run_phase(args) -> int:
             out = root / f".autonomy/runs/{name}/{launch:04d}"
             out.mkdir(parents=True, exist_ok=True)
             result_path = out / "result.json"
-            argv = [args.codex, "--strict-config", "exec", "--sandbox", "workspace-write"]
+            argv = [args.codex, "--strict-config", "exec"]
             if getattr(args, "automatic_review", False):
+                # Native preset selects workspace-write and conflicts with --sandbox.
                 argv += ["--approve-for-me"]
+            else:
+                argv += ["--sandbox", "workspace-write"]
             if state["session_id"]:
                 argv += ["resume", state["session_id"]]
             argv += ["--json", "--output-schema", str(SCHEMA), "--output-last-message", str(result_path), "-"]
