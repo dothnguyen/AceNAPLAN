@@ -82,6 +82,21 @@ class PhaseTests(unittest.TestCase):
         with self.assertRaises(core.GateError):
             core.local(self.root, "../outside")
 
+    def test_automatic_review_preserves_sandbox_and_exact_resume(self):
+        result, calls = self.run_fake(["continue", "blocked"], automatic_review=True)
+        self.assertEqual(result, 2)
+        self.assertEqual(len(calls), 2)
+        for call in calls:
+            self.assertIn("--approve-for-me", call)
+            self.assertEqual(call[call.index("--sandbox") + 1], "workspace-write")
+            self.assertNotIn("--dangerously-bypass-approvals-and-sandbox", call)
+        self.assertIn("resume", calls[1])
+        self.assertEqual(calls[1][calls[1].index("resume") + 1], "fixture-session")
+
+    def test_default_run_does_not_change_approval_routing(self):
+        _, calls = self.run_fake(["blocked"])
+        self.assertNotIn("--approve-for-me", calls[0])
+
     def test_init_never_overwrites(self):
         with self.assertRaises(core.GateError):
             core.initialize(self.root, "mvp", "scope.md")

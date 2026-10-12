@@ -495,6 +495,8 @@ def run_phase(args) -> int:
             out.mkdir(parents=True, exist_ok=True)
             result_path = out / "result.json"
             argv = [args.codex, "--strict-config", "exec", "--sandbox", "workspace-write"]
+            if getattr(args, "automatic_review", False):
+                argv += ["--approve-for-me"]
             if state["session_id"]:
                 argv += ["resume", state["session_id"]]
             argv += ["--json", "--output-schema", str(SCHEMA), "--output-last-message", str(result_path), "-"]
@@ -605,6 +607,8 @@ def main():
     run.add_argument("--max-launches", type=int, default=6)
     run.add_argument("--max-tokens", type=int)
     run.add_argument("--max-cost", type=float, help="Fail closed until aggregate billing accounting is supported")
+    run.add_argument("--automatic-review", action="store_true",
+                     help="Route individual escalation requests through native automatic review; keep workspace sandbox")
     run.add_argument("--renew-budget", action="store_true", help="Explicit operator-authorized budget renewal")
     run.add_argument("--retry-after-diagnosis", action="store_true", help="Operator only: retry after a documented new diagnosis")
     args = parser.parse_args()
