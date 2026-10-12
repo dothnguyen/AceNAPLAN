@@ -1,0 +1,31 @@
+# Project defaults: the primary agent is the Tech Lead.
+model = "gpt-6-astra"
+model_reasoning_effort = "high"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+
+[agents.tech_lead]
+description = "Primary coordination role; spawn only for an explicitly bounded coordination task."
+config_file = "agents/tech_lead.toml"
+
+[agents.architect]
+description = "Architecture, ADRs, SQLite/Firebase contracts, and significant design review."
+config_file = "agents/architect.toml"
+
+[agents.backend_developer]
+description = "Approved Firebase services, authorization, API contracts, and sync implementation."
+config_file = "agents/backend_developer.toml"
+
+[agents.flutter_flame_developer]
+description = "Flutter screens, responsive interaction, and Flame mini-games."
+config_file = "agents/flutter_flame_developer.toml"
+
+[agents.qa_engineer]
+description = "Learning correctness, regression tests, sync verification, and reproducible defects."
+config_file = "agents/qa_engineer.toml"
+
+[agents.code_reviewer]
+description = "Independent read-only review of correctness, security, architecture, and tests."
+config_file = "agents/code_reviewer.toml"

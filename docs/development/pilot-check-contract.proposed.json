@@ -1,0 +1,20 @@
+{
+  "requirements": ["PILOT-01", "PILOT-02", "PILOT-03", "PILOT-04", "PILOT-05", "PILOT-06", "PILOT-07", "PILOT-08", "PILOT-09", "PILOT-10"],
+  "checks": {
+    "PILOT-FORMAT": ["C:/Users/dothn/scoop/apps/flutter/current/bin/cache/dart-sdk/bin/dart.exe", "format", "--output=none", "--set-exit-if-changed", "lib", "test", "integration_test"],
+    "PILOT-ANALYZE": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "analyze"],
+    "PILOT-UNIT-WIDGET": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "test"],
+    "PILOT-CONTENT": ["python", "scripts/verification/pilot_gate.py", "--gate", "content"],
+    "PILOT-SEED-SELECTION": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "test", "test/persistence", "test/session"],
+    "PILOT-WEB-BUILD": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "build", "web", "--dart-define=PILOT_QA_HARNESS=true"],
+    "PILOT-BROWSER-FLOWS": ["python", "scripts/verification/pilot_gate.py", "--gate", "browser"],
+    "PILOT-ANDROID-INTEGRATION": ["python", "scripts/verification/pilot_gate.py", "--gate", "android_integration"],
+    "PILOT-ANDROID-APK": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "build", "apk", "--release"],
+    "PILOT-ANDROID-AAB": ["C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat", "build", "appbundle", "--release"],
+    "PILOT-EDUCATOR": ["python", "scripts/verification/pilot_gate.py", "--gate", "educator"],
+    "PILOT-PHYSICAL-PHONE": ["python", "scripts/verification/pilot_gate.py", "--gate", "physical_phone"],
+    "PILOT-PHYSICAL-TABLET": ["python", "scripts/verification/pilot_gate.py", "--gate", "physical_tablet"],
+    "PILOT-RELEASE-CANDIDATE": ["python", "scripts/verification/pilot_gate.py", "--gate", "release_candidate"]
+  },
+  "required_phase_checks": ["PILOT-FORMAT", "PILOT-ANALYZE", "PILOT-UNIT-WIDGET", "PILOT-CONTENT", "PILOT-SEED-SELECTION", "PILOT-WEB-BUILD", "PILOT-BROWSER-FLOWS", "PILOT-ANDROID-INTEGRATION", "PILOT-ANDROID-APK", "PILOT-ANDROID-AAB", "PILOT-EDUCATOR", "PILOT-PHYSICAL-PHONE", "PILOT-PHYSICAL-TABLET", "PILOT-RELEASE-CANDIDATE"]
+}

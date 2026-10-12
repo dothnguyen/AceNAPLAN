@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phase task board",
+  "type": "object",
+  "required": ["schema_version", "phases"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_at": {"type": "string"},
+    "phases": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"},
+      "additionalProperties": {"$ref": "#/$defs/phase"}
+    }
+  },
+  "$defs": {
+    "strings": {"type": "array", "items": {"type": "string"}},
+    "phase": {
+      "type": "object",
+      "required": ["scope_path", "approval", "contract", "tasks", "execution_status", "last_message"],
+      "properties": {
+        "scope_path": {"type": "string"},
+        "approval": {
+          "type": "object",
+          "required": ["status", "scope_sha256", "contract_sha256", "approved_by", "approved_at", "development_branch"],
+          "properties": {
+            "status": {"enum": ["pending", "approved"]},
+            "scope_sha256": {"type": ["string", "null"]},
+            "contract_sha256": {"type": ["string", "null"]},
+            "approved_by": {"type": ["string", "null"]},
+            "approved_at": {"type": ["string", "null"]},
+            "development_branch": {"type": ["string", "null"]}
+          }
+        },
+        "contract": {
+          "type": "object",
+          "required": ["requirements", "checks", "required_phase_checks"],
+          "properties": {
+            "requirements": {"$ref": "#/$defs/strings"},
+            "checks": {"type": "object", "additionalProperties": {"$ref": "#/$defs/strings"}},
+            "required_phase_checks": {"$ref": "#/$defs/strings"}
+          }
+        },
+        "tasks": {"type": "array", "items": {"$ref": "#/$defs/task"}},
+        "execution_status": {"type": "string"},
+        "last_message": {"type": "string"}
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["id", "description", "epic", "feature", "assigned_agent", "priority", "dependencies", "acceptance_criteria", "relevant_files", "test_requirements", "requirements", "subtasks", "status", "retry_count"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+        "description": {"type": "string", "minLength": 1},
+        "epic": {"type": "string", "minLength": 1},
+        "feature": {"type": "string", "minLength": 1},
+        "assigned_agent": {"enum": ["tech_lead", "architect", "backend_developer", "flutter_flame_developer", "qa_engineer", "code_reviewer"]},
+        "priority": {"type": "integer", "minimum": 0, "maximum": 3},
+        "dependencies": {"$ref": "#/$defs/strings"},
+        "acceptance_criteria": {"$ref": "#/$defs/strings"},
+        "relevant_files": {"$ref": "#/$defs/strings"},
+        "test_requirements": {"$ref": "#/$defs/strings"},
+        "requirements": {"$ref": "#/$defs/strings"},
+        "subtasks": {"$ref": "#/$defs/strings"},
+        "status": {"enum": ["backlog", "ready", "in_progress", "testing", "review", "blocked", "done"]},
+        "retry_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

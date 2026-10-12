@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "phases": {
+    "mvp": {
+      "scope_path": "docs/product/mvp.md",
+      "approval": {
+        "status": "pending",
+        "scope_sha256": null,
+        "contract_sha256": null,
+        "approved_by": null,
+        "approved_at": null,
+        "development_branch": null
+      },
+      "contract": {
+        "requirements": [],
+        "checks": {},
+        "required_phase_checks": []
+      },
+      "tasks": [],
+      "execution_status": "awaiting_approval",
+      "last_message": "Orchestration installed. MVP scope is proposed; no app development authorized or started."
+    },
+    "pilot": {
+      "scope_path": "docs/product/pilot.md",
+      "approval": {
+        "status": "pending",
+        "scope_sha256": null,
+        "contract_sha256": null,
+        "approved_by": null,
+        "approved_at": null,
+        "development_branch": null
+      },
+      "contract": {
+        "requirements": [],
+        "checks": {},
+        "required_phase_checks": []
+      },
+      "tasks": [],
+      "execution_status": "needs_approval",
+      "last_message": "User requested pilot development on 2026-10-13. Registered phase; awaiting explicit Git/branch, ADR0002, project trust and check-contract approval per AGENTS.md. See docs/development/pilot-start-decisions.md."
+    }
+  },
+  "updated_at": "2026-10-12T21:54:37.097842+00:00"
+}

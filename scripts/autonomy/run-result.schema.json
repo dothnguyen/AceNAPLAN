@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["phase", "outcome", "summary"],
+  "properties": {
+    "phase": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"},
+    "outcome": {"type": "string", "enum": ["continue", "needs_approval", "blocked", "complete"]},
+    "summary": {"type": "string", "minLength": 1}
+  }
+}
