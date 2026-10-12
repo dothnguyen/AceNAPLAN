@@ -1,6 +1,8 @@
 # Android pilot execution plan
 
-Status: **Proposed — not execution approval or passing evidence**
+Visual reference: the user-selected `design/AceNAPLAN.html`, mapped to scope in `docs/product/pilot-design-reference.md`. UI tasks must use its phone/tablet home, question and parent-summary compositions with the documented untimed eight-question flow and practice-only reporting adaptations. Include actual screenshots in visual QA evidence.
+
+Status: **Approved implementation plan — 13 October 2026; checks still require actual evidence**
 Date: 2026-10-13 (Australia/Brisbane)
 Scope: [PILOT-01–10](../product/pilot.md)
 Architecture: [proposed ADR 0002](../architecture/adr/0002-android-pilot-implementation.md)

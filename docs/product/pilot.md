@@ -1,10 +1,10 @@
 # Proposed Android MVP pilot: short practice and useful feedback
 
-Status: **Execution requested — implementation prerequisites awaiting approval**.
+Status: **Approved for implementation — 13 October 2026**.
 Suggested phase parameter: `pilot`.
 Date: 12 October 2026 (Australia/Brisbane).
 
-The user requested “Develop pilot phase” on 13 October 2026. The `pilot` phase is registered in the persistent board; its specific Git, architecture, project-trust and check-contract prerequisites still require the approval documented in `docs/development/pilot-start-decisions.md`. Android is the first product release; Web is a supporting agent verification target. The existing `mvp` board entry and `mvp.md` remain unchanged. Publication remains a separate approval.
+The user approved the phase scope and requested development on 13 October 2026, following the concrete prerequisite packet in `docs/development/pilot-start-decisions.md`. Implement using `design/AceNAPLAN.html` and the pilot adaptations in `docs/product/pilot-design-reference.md`. Android is the first product release; Web is a supporting agent verification target. The existing `mvp` board entry and `mvp.md` remain unchanged. Publication remains a separate approval.
 
 ## Goal and hypothesis
 

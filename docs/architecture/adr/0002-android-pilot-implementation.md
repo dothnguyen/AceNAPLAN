@@ -1,6 +1,6 @@
 # ADR 0002: Android pilot, local content and progress
 
-Status: **Proposed — explicit user approval required before dependent implementation**
+Status: **Accepted — user approval on 13 October 2026 following the prerequisite packet**
 Date: 2026-10-13 (Australia/Brisbane)
 Owner: Architect
 Scope: [pilot requirements PILOT-01–10](../../product/pilot.md)

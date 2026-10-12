@@ -23,22 +23,132 @@
     "pilot": {
       "scope_path": "docs/product/pilot.md",
       "approval": {
-        "status": "pending",
-        "scope_sha256": null,
-        "contract_sha256": null,
-        "approved_by": null,
-        "approved_at": null,
-        "development_branch": null
+        "status": "approved",
+        "scope_sha256": "bee57144635329c0093882ac6c37356b184ab1c2c4d3a808619f3df06ab3489d",
+        "contract_sha256": "dda2552674bb68300febca8a4f3fa5d424a34aef3e0fd5b7c37b7cad95f87c96",
+        "development_branch": "development/pilot",
+        "approved_by": "User 2026-10-13: approve phase scope, lets develop pilot phase; approval of prerequisite packet and design/AceNAPLAN.html",
+        "approved_at": "2026-10-12T22:29:48.581759+00:00"
       },
       "contract": {
-        "requirements": [],
-        "checks": {},
-        "required_phase_checks": []
+        "requirements": [
+          "PILOT-01",
+          "PILOT-02",
+          "PILOT-03",
+          "PILOT-04",
+          "PILOT-05",
+          "PILOT-06",
+          "PILOT-07",
+          "PILOT-08",
+          "PILOT-09",
+          "PILOT-10"
+        ],
+        "checks": {
+          "PILOT-FORMAT": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/cache/dart-sdk/bin/dart.exe",
+            "format",
+            "--output=none",
+            "--set-exit-if-changed",
+            "lib",
+            "test",
+            "integration_test"
+          ],
+          "PILOT-ANALYZE": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "analyze"
+          ],
+          "PILOT-UNIT-WIDGET": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "test"
+          ],
+          "PILOT-CONTENT": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "content"
+          ],
+          "PILOT-SEED-SELECTION": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "test",
+            "test/persistence",
+            "test/session"
+          ],
+          "PILOT-WEB-BUILD": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "build",
+            "web",
+            "--dart-define=PILOT_QA_HARNESS=true"
+          ],
+          "PILOT-BROWSER-FLOWS": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "browser"
+          ],
+          "PILOT-ANDROID-INTEGRATION": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "android_integration"
+          ],
+          "PILOT-ANDROID-APK": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "build",
+            "apk",
+            "--release"
+          ],
+          "PILOT-ANDROID-AAB": [
+            "C:/Users/dothn/scoop/apps/flutter/current/bin/flutter.bat",
+            "build",
+            "appbundle",
+            "--release"
+          ],
+          "PILOT-EDUCATOR": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "educator"
+          ],
+          "PILOT-PHYSICAL-PHONE": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "physical_phone"
+          ],
+          "PILOT-PHYSICAL-TABLET": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "physical_tablet"
+          ],
+          "PILOT-RELEASE-CANDIDATE": [
+            "python",
+            "scripts/verification/pilot_gate.py",
+            "--gate",
+            "release_candidate"
+          ]
+        },
+        "required_phase_checks": [
+          "PILOT-FORMAT",
+          "PILOT-ANALYZE",
+          "PILOT-UNIT-WIDGET",
+          "PILOT-CONTENT",
+          "PILOT-SEED-SELECTION",
+          "PILOT-WEB-BUILD",
+          "PILOT-BROWSER-FLOWS",
+          "PILOT-ANDROID-INTEGRATION",
+          "PILOT-ANDROID-APK",
+          "PILOT-ANDROID-AAB",
+          "PILOT-EDUCATOR",
+          "PILOT-PHYSICAL-PHONE",
+          "PILOT-PHYSICAL-TABLET",
+          "PILOT-RELEASE-CANDIDATE"
+        ]
       },
       "tasks": [],
-      "execution_status": "needs_approval",
-      "last_message": "User requested pilot development on 2026-10-13. Registered phase; awaiting explicit Git/branch, ADR0002, project trust and check-contract approval per AGENTS.md. See docs/development/pilot-start-decisions.md."
+      "execution_status": "not_started",
+      "last_message": "Scope approval recorded; execution still requires an explicit phase command."
     }
   },
-  "updated_at": "2026-10-12T21:54:37.097842+00:00"
+  "updated_at": "2026-10-12T22:29:48.581759+00:00"
 }

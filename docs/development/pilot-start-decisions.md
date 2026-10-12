@@ -1,7 +1,7 @@
 # Pilot execution prerequisite packet
 
 Date: 13 October 2026 (Australia/Brisbane)
-Status: Awaiting explicit prerequisite approval; no application implementation started.
+Status: Approved by the user on 13 October 2026: “approve phase scope, lets develop pilot phase”, in response to this prerequisite packet. Git initialization/branch, ADR 0002, narrow project trust and the exact verification contract are authorized. Publication remains separate.
 
 The user's command “Develop pilot phase” authorizes advancing the current Android pilot. The phase has been registered in the persistent board. This packet resolves prerequisites explicitly left open in AGENTS.md and the pilot scope; it does not ask the user to repeat the phase request.
 
@@ -13,6 +13,8 @@ The user's command “Develop pilot phase” authorizes advancing the current An
 4. Accept the proposed requirement/check contract in `pilot-check-contract.proposed.json`. Its named app tests and verification helper are phase implementation deliverables, not currently runnable or already passed. Helpers must independently execute applicable checks or validate genuine revision-bound evidence, fail on missing/stale/invalid evidence, and never manufacture educator or physical-device results. Each opaque gate needs documented evidence/schema and meaningful regression checks before use.
 
 ## Scope interpretation
+
+The user selected `design/AceNAPLAN.html` as the implementation design reference. Apply the phone/tablet screen mapping and pilot adaptations in `docs/product/pilot-design-reference.md` within the existing pilot boundaries.
 
 Use the current catalogue: 16 Numeracy plus 6 Conventions families, 20 reviewed items each (440). Generation is now phase implementation work, not a planning-time draft. An educator reviews actual items, mappings, explanations, audio and stimuli before release inclusion. No placeholder bank/audio is a completed deliverable. Browser verification is supplemental; Android persistence/native checks remain mandatory. Publishing is a separate approval.
 
