@@ -1,0 +1,17 @@
+# This file tracks properties of this Flutter project.
+# Generated manually from the installed Flutter app templates because the SDK
+# cache lock was unavailable to this workspace.
+version:
+  revision: "unknown"
+  channel: "stable"
+
+project_type: app
+
+migration:
+  platforms:
+    - platform: android
+      create_revision: unknown
+      base_revision: unknown
+    - platform: web
+      create_revision: unknown
+      base_revision: unknown
