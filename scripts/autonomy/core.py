@@ -54,6 +54,12 @@ def file_digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def scope_digest(path: Path) -> str:
+    """Hash Markdown content consistently across Git autocrlf checkout policies."""
+    normalized = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def atomic_json(path: Path, data) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     handle, name = tempfile.mkstemp(prefix=".checkpoint-", dir=path.parent)
@@ -185,7 +191,7 @@ def approve(root: Path, board: dict, name: str, branch: str, approver: str, cont
     if not scope.is_file():
         raise GateError("Write and approve the phase scope before recording approval")
     phase["contract"] = contract
-    phase["approval"] = {"status": "approved", "scope_sha256": file_digest(scope),
+    phase["approval"] = {"status": "approved", "scope_sha256": scope_digest(scope),
         "contract_sha256": digest(contract), "development_branch": branch,
         "approved_by": approver, "approved_at": now()}
     phase["execution_status"] = "not_started"
@@ -204,9 +210,10 @@ def revise_approval(root: Path, board: dict, name: str, approver: str, contract:
     if not scope.is_file():
         raise GateError("Write the approved revised scope before recording the revision")
     history = phase.setdefault("approval_history", [])
-    history.append({"approval": dict(approval), "contract": phase["contract"]})
+    history.append({"approval": dict(approval), "contract": phase["contract"],
+                    "recorded_from_head": git(root, "rev-parse", "HEAD") if (root / ".git").exists() else None})
     phase["contract"] = contract
-    phase["approval"] = {**approval, "scope_sha256": file_digest(scope),
+    phase["approval"] = {**approval, "scope_sha256": scope_digest(scope),
         "contract_sha256": digest(contract), "approved_by": approver,
         "approved_at": now(), "revision": approval.get("revision", 1) + 1}
     phase["last_message"] = "Explicitly approved scope and verification-contract revision recorded; existing work and budgets preserved."
@@ -218,7 +225,7 @@ def check_approval(root: Path, phase: dict) -> None:
     if approval.get("status") != "approved":
         raise GateError("Phase scope is not approved; propose scope and request user approval")
     validate_contract(phase["contract"])
-    if file_digest(local(root, phase["scope_path"])) != approval["scope_sha256"]:
+    if scope_digest(local(root, phase["scope_path"])) != approval["scope_sha256"]:
         raise GateError("Scope changed after approval")
     if digest(phase["contract"]) != approval["contract_sha256"]:
         raise GateError("Requirements/check contract changed after approval")

@@ -119,13 +119,23 @@ class PhaseTests(unittest.TestCase):
         with self.assertRaises(core.GateError):
             core.check_approval(self.root, self.phase)
 
+    def test_scope_approval_ignores_git_line_ending_conversion(self):
+        scope = self.root / "scope.md"
+        scope.write_bytes(b"Approved test fixture scope\n")
+        approved_digest = core.scope_digest(scope)
+        scope.write_bytes(b"Approved test fixture scope\r\n")
+        self.assertEqual(core.scope_digest(scope), approved_digest)
+
     def test_explicit_revision_records_prior_approval_and_preserves_branch(self):
         original = copy.deepcopy(self.phase["approval"])
         original_contract = copy.deepcopy(self.phase["contract"])
         next_contract = {**self.contract, "requirements": ["R1", "R2"]}
         (self.root / "scope.md").write_text("Explicitly approved revised scope", encoding="utf-8")
         core.revise_approval(self.root, self.board, "mvp", "explicit revision fixture", next_contract)
-        self.assertEqual(self.phase["approval_history"], [{"approval": original, "contract": original_contract}])
+        prior = self.phase["approval_history"][0]
+        self.assertEqual(prior["approval"], original)
+        self.assertEqual(prior["contract"], original_contract)
+        self.assertIsNone(prior["recorded_from_head"])
         self.assertEqual(self.phase["approval"]["development_branch"], "development/test")
         self.assertEqual(self.phase["approval"]["revision"], 2)
         self.assertEqual(self.phase["contract"], next_contract)
