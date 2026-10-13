@@ -48,8 +48,9 @@ sealed class AnswerRule {
 final class ChoiceOption {
   ChoiceOption({required this.id, required this.label}) {
     _requireText(id, 'option id');
-    if (id.length > 128)
+    if (id.length > 128) {
       throw ArgumentError('Option ID exceeds 128 code units.');
+    }
     _requireText(label, 'option label');
   }
 
