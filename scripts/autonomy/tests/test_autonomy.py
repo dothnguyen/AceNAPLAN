@@ -82,6 +82,19 @@ class PhaseTests(unittest.TestCase):
         with self.assertRaises(core.GateError):
             core.local(self.root, "../outside")
 
+    def test_codex_project_agents_config_uses_role_tables_only(self):
+        import tomllib
+        root = Path(__file__).resolve().parents[3]
+        config_path = root / ".codex/config.toml"
+        config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+        expected = {"tech_lead", "architect", "backend_developer", "flutter_flame_developer", "qa_engineer", "code_reviewer"}
+        agents = config["agents"]
+        self.assertEqual(set(agents), expected)
+        self.assertTrue(all(isinstance(role, dict) for role in agents.values()))
+        for role in expected:
+            role_path = config_path.parent / agents[role]["config_file"]
+            self.assertTrue(role_path.is_file(), role)
+
     def test_automatic_review_preserves_sandbox_and_exact_resume(self):
         result, calls = self.run_fake(["continue", "blocked"], automatic_review=True)
         self.assertEqual(result, 2)

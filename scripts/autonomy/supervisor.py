@@ -398,10 +398,13 @@ def cli_preflight(exe: str, root: Path) -> None:
         config = request(2, "config/read", {"cwd": str(root), "includeLayers": True})["config"]
         agents = config.get("agents", {})
         expected = {"tech_lead", "architect", "backend_developer", "flutter_flame_developer", "qa_engineer", "code_reviewer"}
+        # Older supported Codex runtimes deserialize [agents] as role tables only;
+        # scalar settings there (including enabled/max_concurrent_threads_per_session)
+        # fail config loading. Multi-agent tools default to enabled. The project
+        # instructions cap active delegates at three for those runtimes.
         if (config.get("model") != "gpt-6-astra" or config.get("model_reasoning_effort") != "high"
-            or agents.get("enabled") is not True or agents.get("max_concurrent_threads_per_session") != 3
             or not expected <= agents.keys()):
-            raise GateError("Native team settings not active; trust this project or resolve conflicting configuration before execution")
+            raise GateError("Native team role configuration is incomplete or overridden")
         import tomllib
         pairs = {"tech_lead": ("gpt-6-astra", "high"), "architect": ("gpt-6-astra", "high"),
                  "backend_developer": ("gpt-6-sol", "medium"), "flutter_flame_developer": ("gpt-6-sol", "medium"),
