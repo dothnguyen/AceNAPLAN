@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  path: 1.9.1
+  sqflite: 2.4.4+1
 
 dev_dependencies:
   integration_test:
