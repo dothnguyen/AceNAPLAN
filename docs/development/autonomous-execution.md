@@ -6,7 +6,7 @@
 
 Every phase needs a scope document with requirements and feature IDs, acceptance criteria, exclusions, dependencies, required checks, and unresolved decisions. Start a later phase from [the phase template](../product/phase-template.md). A human approves the concrete scope, development branch, and check contract before dependent phase work starts. Recommendations and an agent's own completion message are not approval evidence.
 
-The board's approval records `scope_sha256`, `contract_sha256`, and `development_branch`. The contract contains unique requirement IDs, approved check IDs mapped to argument arrays, and the mandatory phase check IDs. Both the approved scope bytes and the requirements/check contract must match at launch and resume. Changes invalidate the earlier approval; seek approval for the revised scope or contract. The current `approve` command refuses to overwrite an existing approval: use a newly registered phase for a revised scope unless an explicit approval-revision workflow is separately implemented; do not edit approval hashes by hand. A feature cannot silently add a service, library, data collection, or product requirement outside approved decisions.
+The board's approval records `scope_sha256`, `contract_sha256`, and `development_branch`. The contract contains unique requirement IDs, approved check IDs mapped to argument arrays, and the mandatory phase check IDs. Both the approved scope bytes and the requirements/check contract must match at launch and resume. Changes invalidate the earlier approval. For explicitly user-approved scope revisions, use `revise-approval`; it stores the previous approval and contract in `approval_history`, preserves branch, tasks and usage, and computes new hashes from the edited scope and contract. This is operator-only and requires direct external user approval evidence; never edit approval hashes by hand or infer approval. Ordinary unapproved changes still fail closed. A feature cannot silently add a service, library, data collection, or product requirement outside approved decisions.
 
 Git initialization and branch creation need separate authorization under AGENTS.md. Scope approval does not initialize a repository, select a branch on the user's behalf, or permit changes on a protected branch. Scope inspection, proposal, and orchestration setup can proceed before a Git repository exists; phase implementation must satisfy the runtime's branch and revision gates first.
 
@@ -56,6 +56,8 @@ python scripts/autonomy/supervisor.py approve --phase MVP --contract <contract.j
 ```
 
 The placeholders must be replaced with the reviewed contract, authorized development branch, and evidence identifying the user's approval. This command records approval; it does not solicit or manufacture it, and does not authorize Git initialization, branch creation, or deployment.
+
+After a user explicitly approves a change to an already approved scope/check contract, use `revise-approval --phase <phase> --contract <revised-contract.json> --approved-by <new-user-approval-reference>`. This operator-only operation snapshots the prior approval and contract into `approval_history`, hashes the current scope bytes and revised contract, and preserves the existing branch, tasks and usage budgets. It cannot infer approval, change branches, or waive revalidation of affected work.
 
 The Lead maintains task records through the board helper and can inspect ready work:
 

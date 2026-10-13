@@ -12,5 +12,7 @@ __pycache__/
 build/
 coverage/
 *.iml
+.idea/
+.idea/
 android/local.properties
 android/key.properties

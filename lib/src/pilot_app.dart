@@ -181,7 +181,7 @@ class _TestModeBanner extends StatelessWidget {
           color: _navy,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: const Text(
-            'Test mode — progress resets on refresh',
+            'Evaluation mode — progress resets on exit or reload',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
           ),

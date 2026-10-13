@@ -1,13 +1,13 @@
-# ADR 0002: Android pilot, local content and progress
+# ADR 0002: Android pilot with Windows PC evaluation
 
-Status: **Accepted — user approval on 13 October 2026 following the prerequisite packet**
+Status: **Accepted — Android pilot approval and Windows PC scope revision, 13 October 2026**
 Date: 2026-10-13 (Australia/Brisbane)
 Owner: Architect
-Scope: [pilot requirements PILOT-01–10](../../product/pilot.md)
+Scope: [pilot requirements PILOT-01–11](../../product/pilot.md)
 
 ## Context
 
-The pilot proposes an account-free Android app with bundled, reviewed Numeracy and Conventions practice, SQLite progress, and a Web surface for shared UI verification. [ADR 0001](0001-firebase-sqlite-direction.md) accepts Firebase/SQLite synchronization as the eventual direction; this ADR proposes deferring synchronization for this pilot. It does not select Firebase products or authorize cloud resources. The repository is currently a planning and orchestration scaffold, so this is a contract for future work, not a description of implemented behavior.
+The pilot is an account-free Android app with bundled, reviewed Numeracy and Conventions practice, Android SQLite progress, and supporting Web and Windows evaluation targets. Windows evaluation uses temporary in-memory progress that resets at exit. [ADR 0001](0001-firebase-sqlite-direction.md) accepts Firebase/SQLite synchronization as the eventual direction; this ADR proposes deferring synchronization for this pilot. It does not select Firebase products or authorize cloud resources. A limited Flutter foundation exists; remaining pilot behavior is future work.
 
 ## Options and tradeoffs
 
@@ -17,7 +17,7 @@ The pilot proposes an account-free Android app with bundled, reviewed Numeracy a
 | State and injection | Flutter `ChangeNotifier` controllers, constructor injection at the composition root | Riverpod/BLoC/service locators add dependencies and conventions; revisit if coordination grows |
 | Navigation | Built-in `Navigator` with a small explicit route set and Back handling | A routing package becomes useful for a later deep-linking/public Web product |
 | Android persistence | `sqflite` with the `path` utility, parameterized SQL and versioned migrations | Drift adds generation and abstractions; justified later if query complexity demands it |
-| Web verification | In-memory implementation of the same repository contract | Web SQLite needs separate initialization/persistence validation outside this pilot |
+| Web and Windows evaluation | In-memory implementation of the same repository contract with a persistent test-mode warning | Web/Windows SQLite would add platform-specific persistence work and could mislead about durable data outside this pilot |
 | Audio | `audioplayers` playing packaged, reviewed audio assets | Streaming/TTS at runtime adds connectivity, privacy and reproducibility dependencies |
 | Graphics | Flutter widgets and `CustomPainter` for deterministic grids, instruments, angles and charts | Bundled SVG is acceptable only with an explicitly reviewed renderer dependency; no image-generation service is needed |
 
@@ -31,7 +31,7 @@ Publisher documentation checked on 2026-10-13 lists `sqflite` 2.4.4+1 with Andro
 
 Use `lib/app/` for composition/navigation, `lib/features/practice/` for session presentation/application, `lib/features/progress/` for summaries, `lib/domain/` for shared immutable question/session/attempt models, validators, scoring and selection, and `lib/infrastructure/` for SQLite, bundled content and audio. Folder names may be adjusted without changing the dependency rules. Widgets/controllers depend on contracts; domain code imports neither Flutter nor storage/audio plugins. Use `flutter_test` and Flutter's `integration_test` for checks; do not introduce a test framework/service merely to implement this plan. Flame is deferred because this phase contains no game.
 
-Define one `PracticeRepository` contract with atomic operations: initialize/import approved content, create/resume session, mark presented, record help, submit answer, abandon session, query summary and reset local progress. Use an injectable clock and deterministic selection seed in domain tests. Keep SQL transactions inside the Android implementation; the Web adapter must model the same atomic/idempotent behavior in memory. Conditional platform composition must avoid invoking native storage from Chrome. Android release startup must reject the test repository. Web shows a persistent “Test mode — progress resets on refresh” label.
+Define one `PracticeRepository` contract with atomic operations: initialize/import approved content, create/resume session, mark presented, record help, submit answer, abandon session, query summary and reset local progress. Use an injectable clock and deterministic selection seed in domain tests. Keep SQL transactions inside the Android implementation; Web and Windows evaluation adapters model the same atomic/idempotent behavior in memory. Conditional platform composition must avoid invoking native storage from Chrome or Windows. Android release startup must reject test repositories. Web and Windows display that evaluation progress resets (on reload or app exit, respectively).
 
 Controller states include initializing, ready, saving, feedback and recoverable error. Serialize mutations and disable duplicate submit while saving; repository uniqueness still provides the actual duplicate protection. Persist before reporting an answer as saved. Retry reuses the original operation key. Dispose controllers/listeners and ignore stale async responses after route changes.
 
@@ -99,12 +99,12 @@ Local-only storage has no remote acknowledgement/outbox/conflict policy because 
 
 ## Consequences and verification
 
-The Web adapter keeps agent checks fast but loses progress on refresh and cannot validate SQLite. Device-only progress and a finite reviewed bank constrain the pilot, deliberately and visibly. Content review and real-device availability may block release even after software checks pass. Use the [execution plan](../../development/pilot-execution-plan.md) for coverage and ownership.
+Web and Windows adapters keep evaluation fast but lose progress on reload/exit and cannot validate SQLite. Android remains the durable local target. A finite reviewed bank constrains the pilot. Content review and real-device availability may block release even after software checks pass. Use the [execution plan](../../development/pilot-execution-plan.md) for coverage and ownership.
 
-Recommend Android API 24+ phones/tablets for this pilot, portrait and landscape, plus current installed Chrome for QA. Current Flutter documentation lists Android API 24–37; verify the selected Flutter SDK and resolved plugins before fixing the manifest minimum. Record the tested upper OS versions rather than implying every supported version was executed. [Flutter supported platforms](https://docs.flutter.dev/reference/supported-platforms)
+Support Windows x64 desktop and verify a native Windows build/integration run. Test a resizable window at tall portrait-proportioned and wide landscape-proportioned dimensions. Recommend Android API 24+ phones/tablets, portrait and landscape, plus current installed Chrome for QA. Current Flutter documentation lists Android API 24–37; verify the selected SDK/plugins and record executed OS versions. [Flutter supported platforms](https://docs.flutter.dev/reference/supported-platforms)
 
-Mandatory checks cover pure scoring/selection, content and asset/review validation, Android first launch/import/update/migration/force-stop durability, input/Back/rotation/lifecycle, local reset, real phone and tablet offline/audio/accessibility, profile/release performance, APK/AAB readiness and independent review. An Android emulator is additional native evidence, not a replacement for the required phone/tablet checks. No check described here has been executed for an app that does not yet exist.
+Mandatory checks cover pure scoring/selection, content and asset/review validation, Android first launch/import/update/migration/force-stop durability, Windows desktop integration and build, portrait/landscape-proportioned window layouts, input/Back/rotation/lifecycle, real phone and tablet offline/audio/accessibility, profile/release performance, APK/AAB readiness and independent review. A successful Windows run cannot replace Android persistence/device checks.
 
 ## Approval
 
-No approval is recorded. The user must approve the pilot scope, these library/state/navigation/storage/privacy choices, all 22 families with 440 reviewed questions, device/check boundaries and the finalized executable check contract. The recommended API baseline and device-only backup behavior are included in that approval. Git initialization and creation of a named development branch require separate explicit authorization under AGENTS.md. Uploading or publishing any build, provisioning Firebase and collecting research data require their own later approval.
+The user approved the Android pilot and its prerequisite packet on 13 October 2026, and explicitly approved a Windows PC evaluation target on 13 October 2026. The revised scope and executable Windows build/layout/integration checks are recorded as approval revision 2 in the phase board. The original Android approval and contract remain in approval history. Publishing, provisioning Firebase and collecting research data still require separate approval.

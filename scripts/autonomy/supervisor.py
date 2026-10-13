@@ -12,6 +12,7 @@ import threading
 import time
 from pathlib import Path
 
+import core
 from core import (GateError, WorkspaceLock, approve, atomic_json, check_approval, digest,
                   file_digest, git, initialize, integrated, local, now, persist, phase_coverage,
                   phase_of, quality_evidence, read_board, ready_tasks, slug, snapshot, validate_tasks)
@@ -602,6 +603,10 @@ def main():
     approval.add_argument("--branch", required=True)
     approval.add_argument("--approved-by", required=True)
     approval.add_argument("--contract", type=Path, required=True)
+    revise = commands.add_parser("revise-approval", help="Operator only: record external approval of a revised scope/contract")
+    revise.add_argument("--phase", required=True)
+    revise.add_argument("--approved-by", required=True)
+    revise.add_argument("--contract", type=Path, required=True)
     run = commands.add_parser("run")
     run.add_argument("--phase", required=True)
     run.add_argument("--codex", required=True, help="Path to verified Codex runtime")
@@ -627,6 +632,9 @@ def main():
             with WorkspaceLock(args.root):
                 if args.command == "init":
                     initialize(args.root, args.phase, args.scope)
+                elif args.command == "revise-approval":
+                    core.revise_approval(args.root, read_board(args.root), args.phase, args.approved_by,
+                                         json.loads(args.contract.read_text(encoding="utf-8")))
                 else:
                     approve(args.root, read_board(args.root), args.phase, args.branch, args.approved_by,
                             json.loads(args.contract.read_text(encoding="utf-8")))

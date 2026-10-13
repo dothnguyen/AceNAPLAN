@@ -1,8 +1,12 @@
-void validatePilotPlatform({required bool isWeb, required bool qaHarness}) {
-  if (isWeb && !qaHarness) {
-    throw StateError('Web requires PILOT_QA_HARNESS=true.');
+void validatePilotPlatform({
+  required bool isWeb,
+  required bool isWindows,
+  required bool qaHarness,
+}) {
+  if ((isWeb || isWindows) && !qaHarness) {
+    throw StateError('Web and Windows require PILOT_QA_HARNESS=true.');
   }
-  if (!isWeb && qaHarness) {
-    throw StateError('PILOT_QA_HARNESS is not permitted on Android.');
+  if (!isWeb && !isWindows && qaHarness) {
+    throw StateError('PILOT_QA_HARNESS is only permitted on Web or Windows.');
   }
 }

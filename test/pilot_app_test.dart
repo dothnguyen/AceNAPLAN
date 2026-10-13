@@ -8,6 +8,8 @@ void main() {
     const Size(390, 844),
     const Size(844, 390),
     const Size(1180, 820),
+    const Size(720, 1100),
+    const Size(1440, 900),
   ]) {
     testWidgets('landing remains readable at $size', (tester) async {
       tester.view.physicalSize = size;
@@ -32,7 +34,8 @@ void main() {
         child: const PilotApp(testMode: true),
       ),
     );
-    expect(find.text('Test mode — progress resets on refresh'), findsOneWidget);
+    expect(find.text('Evaluation mode — progress resets on exit or reload'),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

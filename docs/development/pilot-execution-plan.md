@@ -1,18 +1,18 @@
-# Android pilot execution plan
+# Android pilot and Windows PC evaluation execution plan
 
 Visual reference: the user-selected `design/AceNAPLAN.html`, mapped to scope in `docs/product/pilot-design-reference.md`. UI tasks must use its phone/tablet home, question and parent-summary compositions with the documented untimed eight-question flow and practice-only reporting adaptations. Include actual screenshots in visual QA evidence.
 
-Status: **Approved implementation plan — 13 October 2026; checks still require actual evidence**
+Status: **Approved implementation plan, scope revision 2 — 13 October 2026; checks still require current phase evidence**
 Date: 2026-10-13 (Australia/Brisbane)
-Scope: [PILOT-01–10](../product/pilot.md)
+Scope: [PILOT-01–11](../product/pilot.md)
 Architecture: [proposed ADR 0002](../architecture/adr/0002-android-pilot-implementation.md)
 Coordinator contract: [autonomous execution](autonomous-execution.md)
 
 ## Decision packet
 
-Recommend approval of the complete Android pilot with all 22 candidate families, 20 reviewed items per family (440 total), bundled reviewed audio for 20 dictation words, an eight-question 4 Numeracy/4 Conventions mixed session, and topic practice. Use shared pure Dart rules, `ChangeNotifier`, constructor injection, built-in `Navigator`, Android `sqflite`, an explicitly labelled in-memory Web QA adapter, `audioplayers` for local assets, and deterministic Flutter painters/widgets. Defer Firebase integration, accounts, cloud backup of learner data, analytics, paid/external generation services, Flame games and public Web/iOS release. These are recommendations, not approved dependencies or privacy decisions.
+The base Android pilot was approved by the user. Scope revision 2 adds a resizable Windows PC evaluation build and explicit Windows layout/integration/build checks. The pilot still targets all 22 candidate families and 440 reviewed items, 20 bundled spelling recordings, mixed/topic practice, Android `sqflite`, shared pure Dart rules, `ChangeNotifier`, constructor injection, built-in `Navigator`, a visibly temporary in-memory Windows/Web repository, `audioplayers` for local assets, and deterministic Flutter painters/widgets. Firebase sync, accounts, cloud learner-data backup, analytics, paid/external generation, Flame games and public Web/iOS releases remain deferred under the recorded decisions.
 
-The approved scope and concrete argument-array check contract must be finalized together before scope/contract hashes are recorded by the existing supervisor. The Lead owns the board and progress file; this plan neither modifies them nor grants approval. Do not start app work, initialize Git, create a branch, claim a device result or run a competing coordinator from this document. Separately request Git initialization and a named development branch if the workspace still has no repository.
+Scope and check-contract approvals are recorded together with revision history in the pilot board. The Lead owns the board and progress file; this plan neither modifies them nor grants approval. Run the single supervisor for phase coordination. Current per-check evidence is in `.autonomy/evidence/pilot/`.
 
 ## Proposed family catalogue
 
@@ -61,13 +61,13 @@ These are proposed task groups; the Lead translates them into bounded tasks afte
 
 | Epic | Requirements | Dependencies | Primary ownership and acceptance |
 | --- | --- | --- | --- |
-| P00 Foundation | 01, 02, 06 | Approved scope/ADR/contract, Git/branch and toolchain | Lead + Flutter developer: Android/Web Flutter shell, pinned dependencies, composition, responsive routes, no-account startup, test-adapter label and native-release guard |
+| P00 Foundation | 01, 02, 06, 11 | Approved scope/ADR/contract, Git/branch and toolchain | Lead + Flutter developer: Android/Windows/Web shell, pinned dependencies, composition, responsive phone/tablet/window layouts, no-account startup, test-adapter labels and native-release guard |
 | P01 Domain/content | 03, 04, 05, 09 | P00 contracts | Flutter/domain implementation with educator review: schema, all 22 families/templates, 440 draft then approved items, exact scoring, provenance, accessible stimuli and audio manifest |
 | P02 Android persistence | 06, 09 | P00, P01 schema | Bounded storage implementer: SQLite schema/migrations, atomic importer, immutable revisions, restart recovery, reset, backup exclusions; Lead owns migration ordering |
 | P03 Session selection | 02, 05, 10 | P01 rules, P02 transaction contract | Flutter/domain developer: deterministic quotas, distinct unseen items, atomic reservation/presentation/help/submission, resume, exhaustion and labelled review |
 | P04 Practice experience | 01, 02, 03, 05 | P01 widgets, P03 | Flutter developer: input, hints/explanations, keyboard/Back, audio lifecycle/errors and accessible alternatives; actual Android/Web behavior |
 | P05 Parent/local summary | 07, 08 | P02, P03 | Flutter developer: independent/helped/review totals, sample-size caveat, deterministic next-topic rule, local reset and parent feedback with no automatic data upload |
-| P06 Verification/candidate | All | P00–P05, content/audio approval, target access | QA + independent reviewer: final revision evidence, phone/tablet checks, Android release candidate, documented limitations and release readiness; no upload |
+| P06 Verification/candidate | All | P00–P05, content/audio approval, target access | QA + independent reviewer: final revision evidence, phone/tablet and Windows checks, Android release candidate, documented limitations and release readiness; no upload |
 
 For the next-topic rule recommend the practiced topic with the lowest independent correct fraction once it has at least five independent attempts; break ties by fewer attempts then stable topic ID. With fewer than five attempts, state “A small sample — try more practice,” and recommend the least-practiced available topic using a stable tie-break. Helped/review attempts never inflate that fraction. This is practice guidance, not proficiency assessment. Cover these exact rules in P05 unit tests.
 
@@ -75,7 +75,7 @@ Backend role work, if used, is bounded to the approved local persistence contrac
 
 ## Mandatory check intents
 
-The Lead's [proposed executable contract](pilot-check-contract.proposed.json) defines 14 concrete check IDs and argument arrays. The following intent names are coverage requirements, not claims that scripts exist or that commands have run. Named tests and `scripts/verification/pilot_gate.py` are implementation deliverables; the contract may approve these future checks, but they must exist and independently execute checks or validate genuine, revision-bound evidence before any gate can pass. Missing/unavailable evidence fails closed. No dummy success command or browser-only replacement satisfies native checks.
+The revised executable contract defines 17 concrete check IDs and argument arrays, including Windows desktop integration, build and responsive-layout checks. The following intent names are coverage requirements, not claims that all scripts exist or that commands have run. Named tests and `scripts/verification/pilot_gate.py` are implementation deliverables; they must independently execute checks or validate genuine, revision-bound evidence before any gate can pass. Missing/unavailable evidence fails closed. No dummy success command or browser-only replacement satisfies native checks.
 
 | Check intent | Required evidence |
 | --- | --- |
@@ -86,6 +86,8 @@ The Lead's [proposed executable contract](pilot-check-contract.proposed.json) de
 | Android repository | Real SQLite first import/idempotence/rollback, partial import, schema migrations, active-set update, pinned revisions/assets, duplicate submission, write errors, local reset and historical progress |
 | Widget/accessibility | Session/summary flows, error/retry/loading, large text, semantic names/focus, visible units and readable stimuli, portrait/landscape sizes, assisted/review totals |
 | Browser flows | Chrome version + memory adapter identity, keyboard navigation and complete shared flows at phone/tablet sizes; refresh reset is expected and visible |
+| Windows PC evaluation | Native Windows integration launch, visible in-memory test warning, portrait-proportioned and landscape-proportioned layouts; progress resets on exit |
+| Windows PC evaluation | Native Windows integration launch, visible in-memory test warning, portrait-proportioned and landscape-proportioned layouts; progress resets on exit |
 | Android integration | Device/emulator ID + OS + build mode + SQLite adapter, force-stop/relaunch, rotation, keyboard/insets/Back, background/resume, interruption, offline/audio and upgrade with retained progress |
 | Real phone | Model/OS/build hash, physical installation/update, offline first use and resume, touch/audio/TalkBack, keyboard, portrait/landscape, local summary/reset and profile/release performance |
 | Real tablet | Same evidence independently on a representative physical tablet; browser resizing/emulator evidence does not satisfy this gate |
@@ -99,8 +101,8 @@ Device performance evidence includes measured cold-start-to-ready and question-t
 
 ## Execution and completion
 
-After explicit approval, record exact scope/contract digests, branch, PILOT-01–10 and check IDs using the existing approval workflow. The supervisor's OS lock remains the single-runner gate. The invoking chat monitors; its resumable supervised Lead coordinates. Only the Lead updates board/progress, and only the supervisor accepts completed candidates after actual check execution and evidence validation.
+After explicit approval, record exact scope/contract digests, branch, PILOT-01–11 and check IDs using the revision approval workflow, preserving earlier approvals. The supervisor's OS lock remains the single-runner gate. The invoking chat monitors; its resumable supervised Lead coordinates. Only the Lead updates board/progress, and only the supervisor accepts completed candidates after actual check execution and evidence validation.
 
 Implement foundation and a small domain/storage vertical slice first to expose seeding/resume risks; the release bank remains gated until every family and review passes. Parallelize independent content authoring and UI work only after their contracts are stable. QA/review findings become linked defects; fixes rerun affected checks and receive fresh review where needed. Bind reports to the actual revision/content fingerprint.
 
-Completion requires all ten requirements, mandatory checks, reviewed bank/audio, real Android phone and tablet evidence, current independent implementation review, and a release-candidate record. Tool absence, educator availability, missing device/signing access or a runtime limit remains visible unfinished work. A successfully generated APK, browser test, drafted bank or completed subtask does not waive a remaining gate. Play upload/publication and the market experiment are separately authorized operations.
+Completion requires all eleven requirements, mandatory checks, reviewed bank/audio, usable Windows evaluation, real Android phone and tablet evidence, current independent implementation review, and a release-candidate record. Tool absence, educator availability, missing device/signing access or a runtime limit remains visible unfinished work. A successfully generated APK, browser test, Windows build, drafted bank or completed subtask does not waive a remaining gate. Play upload/publication and the market experiment are separately authorized operations.

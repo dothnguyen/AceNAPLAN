@@ -7,7 +7,10 @@ import 'src/platform_guard.dart';
 void main() {
   validatePilotPlatform(
     isWeb: kIsWeb,
+    isWindows: !kIsWeb && defaultTargetPlatform == TargetPlatform.windows,
     qaHarness: const bool.fromEnvironment('PILOT_QA_HARNESS'),
   );
-  runApp(const PilotApp(testMode: kIsWeb));
+  runApp(PilotApp(
+    testMode: kIsWeb || defaultTargetPlatform == TargetPlatform.windows,
+  ));
 }

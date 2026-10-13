@@ -193,6 +193,26 @@ def approve(root: Path, board: dict, name: str, branch: str, approver: str, cont
     persist(root, board)
 
 
+def revise_approval(root: Path, board: dict, name: str, approver: str, contract: dict) -> None:
+    """Record explicit external approval of a revised scope/check contract, preserving its history."""
+    phase = phase_of(board, name)
+    validate_contract(contract)
+    approval = phase["approval"]
+    if approval.get("status") != "approved" or not approver.strip():
+        raise GateError("Revision requires an existing approval and explicit external user approval evidence")
+    scope = local(root, phase["scope_path"])
+    if not scope.is_file():
+        raise GateError("Write the approved revised scope before recording the revision")
+    history = phase.setdefault("approval_history", [])
+    history.append({"approval": dict(approval), "contract": phase["contract"]})
+    phase["contract"] = contract
+    phase["approval"] = {**approval, "scope_sha256": file_digest(scope),
+        "contract_sha256": digest(contract), "approved_by": approver,
+        "approved_at": now(), "revision": approval.get("revision", 1) + 1}
+    phase["last_message"] = "Explicitly approved scope and verification-contract revision recorded; existing work and budgets preserved."
+    persist(root, board)
+
+
 def check_approval(root: Path, phase: dict) -> None:
     approval = phase["approval"]
     if approval.get("status") != "approved":

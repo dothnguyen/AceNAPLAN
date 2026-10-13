@@ -1,9 +1,9 @@
 # Pilot execution prerequisite packet
 
 Date: 13 October 2026 (Australia/Brisbane)
-Status: Approved by the user on 13 October 2026: “approve phase scope, lets develop pilot phase”, in response to this prerequisite packet. Git initialization/branch, ADR 0002, narrow project trust and the exact verification contract are authorized. Publication remains separate.
+Status: Approved by the user on 13 October 2026: “approve phase scope, lets develop pilot phase”, in response to this prerequisite packet. Git initialization/branch, ADR 0002, narrow project trust and the exact verification contract are authorized. Publication remains separate. The user also requested a Windows PC target supporting portrait- and landscape-proportioned windows on 13 October 2026; see the separately approved revision 2 in the phase board.
 
-The user's command “Develop pilot phase” authorizes advancing the current Android pilot. The phase has been registered in the persistent board. This packet resolves prerequisites explicitly left open in AGENTS.md and the pilot scope; it does not ask the user to repeat the phase request.
+The user's command “Develop pilot phase” authorizes advancing the approved pilot. The user subsequently requested a Windows PC target with portrait and landscape support, which explicitly authorizes that scope revision. The phase is registered in the persistent board. This packet resolves the originally open implementation prerequisites; it does not ask the user to repeat the phase request.
 
 ## Concrete decisions to approve
 

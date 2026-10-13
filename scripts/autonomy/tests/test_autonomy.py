@@ -119,6 +119,23 @@ class PhaseTests(unittest.TestCase):
         with self.assertRaises(core.GateError):
             core.check_approval(self.root, self.phase)
 
+    def test_explicit_revision_records_prior_approval_and_preserves_branch(self):
+        original = copy.deepcopy(self.phase["approval"])
+        original_contract = copy.deepcopy(self.phase["contract"])
+        next_contract = {**self.contract, "requirements": ["R1", "R2"]}
+        (self.root / "scope.md").write_text("Explicitly approved revised scope", encoding="utf-8")
+        core.revise_approval(self.root, self.board, "mvp", "explicit revision fixture", next_contract)
+        self.assertEqual(self.phase["approval_history"], [{"approval": original, "contract": original_contract}])
+        self.assertEqual(self.phase["approval"]["development_branch"], "development/test")
+        self.assertEqual(self.phase["approval"]["revision"], 2)
+        self.assertEqual(self.phase["contract"], next_contract)
+        core.check_approval(self.root, self.phase)
+
+    def test_revision_requires_an_existing_approved_phase(self):
+        self.phase["approval"]["status"] = "pending"
+        with self.assertRaises(core.GateError):
+            core.revise_approval(self.root, self.board, "mvp", "no approval", self.contract)
+
     def test_empty_contract_and_protected_branch_rejected(self):
         with self.assertRaises(core.GateError):
             core.validate_contract({"requirements": [], "checks": {}, "required_phase_checks": []})
