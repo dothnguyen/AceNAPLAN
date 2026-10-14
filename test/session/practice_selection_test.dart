@@ -153,14 +153,14 @@ void main() {
   test('mixed selection balances families across difficulty buckets', () {
     final source = [
       for (var n = 0; n < 2; n++)
-        item('a-i-$n', QuestionDomain.numeracy,
-            QuestionDifficulty.introductory, 'a'),
+        item('a-i-$n', QuestionDomain.numeracy, QuestionDifficulty.introductory,
+            'a'),
       for (var n = 0; n < 2; n++)
-        item('b-i-$n', QuestionDomain.numeracy,
-            QuestionDifficulty.introductory, 'b'),
+        item('b-i-$n', QuestionDomain.numeracy, QuestionDifficulty.introductory,
+            'b'),
       for (var n = 0; n < 4; n++)
-        item('b-d-$n', QuestionDomain.numeracy,
-            QuestionDifficulty.developing, 'b'),
+        item('b-d-$n', QuestionDomain.numeracy, QuestionDifficulty.developing,
+            'b'),
     ];
     final result = selectPractice(
       candidates: source,
