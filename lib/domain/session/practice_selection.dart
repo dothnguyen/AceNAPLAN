@@ -347,7 +347,9 @@ PracticeSelection selectPractice({
           int limit,
           String domain,
         ) {
-          if (path.length >= limit) return null;
+          if (path.length >= limit) {
+            return null;
+          }
           for (final next in cycleByOldFamily['$domain/$current'] ??
               const <_SelectionSwap>[]) {
             if (usedIndices.contains(next.index) ||
@@ -367,7 +369,9 @@ PracticeSelection selectPractice({
               limit,
               domain,
             );
-            if (found != null) return found;
+            if (found != null) {
+              return found;
+            }
           }
           return null;
         }
@@ -383,7 +387,9 @@ PracticeSelection selectPractice({
             limit,
             domain.name,
           );
-          if (path == null) continue;
+          if (path == null) {
+            continue;
+          }
           for (final swap in path) {
             apply(swap);
           }
