@@ -149,6 +149,19 @@ void main() {
         }),
         throwsA(isA<DatabaseException>()),
       );
+      for (final invalidExposure in [
+        {'learner_key': 'local-learner', 'item_id': 'unreserved-item'},
+        {'learner_key': 'different-learner', 'item_id': 'item-1'},
+      ]) {
+        await expectLater(
+          db.insert('item_exposure', {
+            ...invalidExposure,
+            'first_presented_at': '2026-01-01T00:00:00Z',
+            'first_session_id': 'session-1',
+          }),
+          throwsA(isA<DatabaseException>()),
+        );
+      }
       await expectLater(db.transaction((txn) async {
         await txn.insert('item_exposure', {
           'learner_key': 'local-learner',

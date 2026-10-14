@@ -64,7 +64,8 @@ const _schemaV1 = <String>[
     selection_seed INTEGER NOT NULL,
     status TEXT NOT NULL CHECK (status IN ('active', 'paused', 'completed', 'abandoned')),
     created_at TEXT NOT NULL,
-    completed_at TEXT
+    completed_at TEXT,
+    UNIQUE (session_id, learner_key)
   )''',
   '''CREATE UNIQUE INDEX one_open_practice_session
     ON practice_session(learner_key)
@@ -90,7 +91,10 @@ const _schemaV1 = <String>[
     first_presented_at TEXT NOT NULL,
     first_session_id TEXT NOT NULL,
     PRIMARY KEY (learner_key, item_id),
-    FOREIGN KEY (first_session_id) REFERENCES practice_session(session_id)
+    FOREIGN KEY (first_session_id, item_id)
+      REFERENCES session_item(session_id, item_id),
+    FOREIGN KEY (first_session_id, learner_key)
+      REFERENCES practice_session(session_id, learner_key)
   )''',
   '''CREATE TABLE attempt (
     attempt_id TEXT PRIMARY KEY NOT NULL,
