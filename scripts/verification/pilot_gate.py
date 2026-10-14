@@ -9,19 +9,17 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Sequence
+from pathlib import Path
+
+from evidence import EvidenceError
+from gate_context import GATE_CHECKS, validate_gate_context
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "autonomy"))
+import core  # noqa: E402
 
 
 # Names are fixed by the approved pilot check contract. Do not infer new gates
 # from an evidence envelope or a caller-supplied path.
-OPAQUE_GATES = frozenset({
-    "content",
-    "browser",
-    "android_integration",
-    "educator",
-    "physical_phone",
-    "physical_tablet",
-    "release_candidate",
-})
+OPAQUE_GATES = frozenset(GATE_CHECKS)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -32,9 +30,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--gate must be supplied exactly once")
     gate = arguments.gate[0]
 
-    # No semantic validator has been approved/implemented for these gates.
-    # In particular, a caller cannot turn a structurally valid envelope into
-    # a pass by supplying it as an extra argument.
+    try:
+        validate_gate_context(gate, workspace=Path(__file__).resolve().parents[2])
+    except (EvidenceError, core.GateError, OSError, ValueError, KeyError, TypeError) as error:
+        print(f"PILOT gate {gate} cannot pass: semantic validator unavailable; {error}",
+              file=sys.stderr)
+        return 1
+
+    # Envelope integrity is only a prerequisite; no semantic validators exist.
     print(
         f"PILOT gate {gate} cannot pass: semantic validator and "
         "genuine gate evidence are not implemented",

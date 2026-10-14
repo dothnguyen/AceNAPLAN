@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "status": "draft_planning",
+  "release_bank": false,
+  "planned_family_count": 22,
+  "planned_item_count": 440,
+  "families": [
+    {
+      "id": "N-PV-01", "domain": "numeracy", "topic": "place_value", "skill": "Identify the value of a highlighted digit", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "whole_number", "target_item_count": 10}, {"id": "decimal", "target_item_count": 10}]
+    },
+    {
+      "id": "N-PV-02", "domain": "numeracy", "topic": "place_value", "skill": "Compare or order number values", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "compare", "target_item_count": 10}, {"id": "ordered_list", "target_item_count": 10}]
+    },
+    {
+      "id": "N-OP-01", "domain": "numeracy", "topic": "operations_in_context", "skill": "Solve addition and subtraction word problems", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "addition", "target_item_count": 10}, {"id": "subtraction", "target_item_count": 10}]
+    },
+    {
+      "id": "N-OP-02", "domain": "numeracy", "topic": "operations_in_context", "skill": "Solve equal grouping and sharing problems with whole answers", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "equal_groups", "target_item_count": 10}, {"id": "sharing_division", "target_item_count": 10}]
+    },
+    {
+      "id": "N-FD-01", "domain": "numeracy", "topic": "fractions_and_decimals", "skill": "Find a fraction of a collection with an integral result", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "described_set", "target_item_count": 10}, {"id": "visually_grouped_set", "target_item_count": 10}]
+    },
+    {
+      "id": "N-FD-02", "domain": "numeracy", "topic": "fractions_and_decimals", "skill": "Recognise equivalent fraction and decimal representations", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "equivalent_representations", "target_item_count": 10}, {"id": "fraction_decimal_match", "target_item_count": 10}]
+    },
+    {
+      "id": "N-PA-01", "domain": "numeracy", "topic": "patterns_and_unknowns", "skill": "Find an unknown value in a number sentence", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "additive", "target_item_count": 10}, {"id": "multiplicative", "target_item_count": 10}]
+    },
+    {
+      "id": "N-PA-02", "domain": "numeracy", "topic": "patterns_and_unknowns", "skill": "Continue a sequence using its stated rule", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "increasing", "target_item_count": 10}, {"id": "decreasing", "target_item_count": 10}]
+    },
+    {
+      "id": "N-MT-01", "domain": "numeracy", "topic": "measurement_and_time", "skill": "Calculate elapsed time without date rollover", "response_format": "numeric_with_displayed_unit", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "within_hour", "target_item_count": 10}, {"id": "crossing_hour", "target_item_count": 10}]
+    },
+    {
+      "id": "N-MT-02", "domain": "numeracy", "topic": "measurement_and_time", "skill": "Read a scaled measuring instrument with labelled units", "response_format": "numeric_with_displayed_unit", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "length", "target_item_count": 10}, {"id": "capacity", "target_item_count": 10}]
+    },
+    {
+      "id": "N-SP-01", "domain": "numeracy", "topic": "space", "skill": "Locate an object using a grid reference", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "identify_cell", "target_item_count": 10}, {"id": "follow_location_instruction", "target_item_count": 10}]
+    },
+    {
+      "id": "N-SP-02", "domain": "numeracy", "topic": "space", "skill": "Compare an angle with a right angle", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "smaller", "target_item_count": 7}, {"id": "equal", "target_item_count": 6}, {"id": "larger", "target_item_count": 7}]
+    },
+    {
+      "id": "N-DT-01", "domain": "numeracy", "topic": "data_interpretation", "skill": "Read values from a scaled graph", "response_format": "numeric", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "direct_value", "target_item_count": 10}, {"id": "difference", "target_item_count": 10}]
+    },
+    {
+      "id": "N-DT-02", "domain": "numeracy", "topic": "data_interpretation", "skill": "Compare values in a table", "response_format": "single_choice_or_numeric_per_item", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "comparison", "response_format": "single_choice", "target_item_count": 10}, {"id": "difference", "response_format": "numeric", "target_item_count": 10}]
+    },
+    {
+      "id": "N-CH-01", "domain": "numeracy", "topic": "chance", "skill": "Compare likelihoods from a simple collection", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "compare_events", "target_item_count": 10}, {"id": "most_or_least_likely", "target_item_count": 10}]
+    },
+    {
+      "id": "N-CH-02", "domain": "numeracy", "topic": "chance", "skill": "Identify possible, certain and impossible events", "response_format": "single_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "possible", "target_item_count": 7}, {"id": "certain", "target_item_count": 7}, {"id": "impossible", "target_item_count": 6}]
+    },
+    {
+      "id": "C-SP-01", "domain": "conventions", "topic": "spelling", "skill": "Spell a word from contextual audio dictation", "response_format": "spelling_entry", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "distinct_word_and_context_recording", "target_item_count": 20}]
+    },
+    {
+      "id": "C-SP-02", "domain": "conventions", "topic": "spelling", "skill": "Correct a misspelled word in context", "response_format": "spelling_entry", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "distinct_word_and_misspelling", "target_item_count": 20}]
+    },
+    {
+      "id": "C-GR-01", "domain": "conventions", "topic": "grammar", "skill": "Choose subject–verb agreement in context", "response_format": "sentence_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "singular", "target_item_count": 10}, {"id": "plural", "target_item_count": 10}]
+    },
+    {
+      "id": "C-GR-02", "domain": "conventions", "topic": "grammar", "skill": "Complete a sentence with the appropriate tense, connective or word", "response_format": "sentence_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "tense", "target_item_count": 8}, {"id": "connective", "target_item_count": 6}, {"id": "appropriate_word", "target_item_count": 6}]
+    },
+    {
+      "id": "C-PU-01", "domain": "conventions", "topic": "punctuation", "skill": "Choose sentence boundaries, end marks and capitals", "response_format": "sentence_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "end_mark_or_boundary", "target_item_count": 10}, {"id": "capital_letter", "target_item_count": 10}]
+    },
+    {
+      "id": "C-PU-02", "domain": "conventions", "topic": "punctuation", "skill": "Choose apostrophes for contractions or possession in context", "response_format": "sentence_choice", "target_item_count": 20, "difficulty_targets": {"introductory": 10, "developing": 10},
+      "variants": [{"id": "contraction", "target_item_count": 10}, {"id": "possession", "target_item_count": 10}]
+    }
+  ]
+}

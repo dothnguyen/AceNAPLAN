@@ -13,12 +13,12 @@ void main() {
         '-s',
         'scripts/verification/tests',
         '-p',
-        'test_pilot_gate.py',
+        'test_*gate*.py',
         '-v',
       ],
       workingDirectory: Directory.current.path,
     );
     expect(result.exitCode, 0, reason: '${result.stdout}\n${result.stderr}');
-    expect(result.stderr.toString(), contains('Ran 3 tests'));
+    expect(result.stderr.toString(), contains('Ran 8 tests'));
   });
 }
