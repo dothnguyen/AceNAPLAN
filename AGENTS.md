@@ -10,16 +10,16 @@ The user's approved direction takes precedence over the earlier Godot/Firebase i
 
 ## Native team and delegation
 
-The primary agent acts as Tech Lead. Use the six native definitions under `.codex/agents/`; the primary model defaults to gpt-6-astra/high. A separately spawned Tech Lead is only useful when the user explicitly requests a bounded coordination task; do not create a second coordinator for routine work.
+The primary agent acts as Tech Lead. Use the six native definitions under `.codex/agents/`; the primary model defaults to gpt-6-sol/medium. A separately spawned Tech Lead is only useful when the user explicitly requests a bounded coordination task; do not create a second coordinator for routine work.
 
 | Role | Responsibility | Model / effort |
 | --- | --- | --- |
-| tech_lead | Plan, delegate, integrate, report | gpt-6-astra / high |
-| architect | Recommend architecture, contracts, ADRs | gpt-6-astra / high |
+| tech_lead | Plan, delegate, integrate, report | gpt-6-sol / medium |
+| architect | Recommend architecture, contracts, ADRs | gpt-6-sol / medium |
 | backend_developer | Implement approved Firebase and synchronization contracts | gpt-6-sol / medium |
 | flutter_flame_developer | Flutter UI and Flame implementation | gpt-6-sol / medium |
 | qa_engineer | Test design, execution, defect reporting | gpt-5.6-terra / medium |
-| code_reviewer | Independent review without implementation edits | gpt-6-sol / high |
+| code_reviewer | Independent review without implementation edits | gpt-6-sol / medium |
 
 Use native subagents for bounded specialist tasks when they add value. At most three subagents may be active at once. Do not invoke every role for every task. The Lead may handle trivial changes directly; skip architecture for routine widgets and backend work for purely local UI changes. Specialists report to the Lead and do not spawn more agents or delegate circularly.
 

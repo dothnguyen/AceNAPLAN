@@ -8,16 +8,16 @@ The desktop model catalog fetched on 2026-10-12 lists gpt-6-astra, gpt-6-sol, an
 
 | Role | Model | Effort |
 | --- | --- | --- |
-| Primary Tech Lead / tech_lead | gpt-6-astra | high |
-| architect | gpt-6-astra | high |
+| Primary Tech Lead / tech_lead | gpt-6-sol | medium |
+| architect | gpt-6-sol | medium |
 | backend_developer | gpt-6-sol | medium |
 | flutter_flame_developer | gpt-6-sol | medium |
 | qa_engineer | gpt-5.6-terra | medium |
-| code_reviewer | gpt-6-sol | high |
+| code_reviewer | gpt-6-sol | medium |
 
 ## Configuration
 
-`.codex/config.toml` sets primary model/effort, enables native agents, caps concurrently open spawned threads at three (primary excluded), and explicitly registers six role files. Each standalone `.codex/agents/*.toml` contains name, description, developer_instructions, model, and model_reasoning_effort. Reviewer additionally uses a read-only sandbox. Other roles inherit the session's permission policy; this setup does not weaken permissions or change global configuration.
+`.codex/config.toml` sets primary model/effort and explicitly registers six role files. Native multi-agent tools are enabled by default in the supported runtime. `AGENTS.md` limits active specialists to three (primary excluded); this limit is an instruction, not a runtime setting in this configuration. Each standalone `.codex/agents/*.toml` contains name, description, developer_instructions, model, and model_reasoning_effort. Reviewer additionally uses a read-only sandbox. Other roles inherit the session's permission policy; this setup does not weaken permissions or change global configuration.
 
 The Lead is the primary coordinator; do not spawn a duplicate Lead. Its standalone definition supports explicit bounded coordination tasks. The optional local Python supervisor provides bounded, manually started Codex execution and evidence validation. It uses native Codex sessions and specialists; it creates no background schedule and does not replace them with simulated agents.
 
@@ -25,7 +25,7 @@ Official references: [Subagents](https://learn.chatgpt.com/docs/agent-configurat
 
 ## Use in the desktop
 
-Start a new chat in this project after creating the configuration so project instructions/configuration are loaded. Select gpt-6-astra with High in the composer if the desktop preserves a previous model selection; confirm it rather than assuming a project default changes an existing chat. Ask the primary agent to act as Tech Lead and use the named native roles. Existing sessions may not reload new custom roles/settings immediately.
+Start a new chat in this project after creating the configuration so project instructions/configuration are loaded. Select gpt-6-sol with Medium in the composer if the desktop preserves a previous model selection; confirm it rather than assuming a project default changes an existing chat. Ask the primary agent to act as Tech Lead and use the named native roles. Existing sessions may not reload new custom roles/settings immediately.
 
 Project-local configuration is gated by project trust. No matching trust entry was found in the inspected user config. If the new session reports that local configuration is disabled, use the client's project trust flow before relying on these role definitions. For CLI use, the native diagnostic specifies a trusted project entry in user-level config; this setup does not edit that machine-level security setting. The isolated validation used a temporary Codex home with only a trust entry for this workspace and confirmed that the installed runtime loads the project layer. It did not alter your actual trust settings.
 
@@ -35,11 +35,11 @@ Example feature request after the app exists:
 
 Example architecture request:
 
-> Delegate to architect a proposed ADR for Firebase products and SQLite synchronization on Android, iOS, and Web. Use gpt-6-astra/high. Compare practical options and define conflicts, retries, deletion, authorization, migrations, and verification. Do not implement, provision, or deploy. Return the proposed decision for my approval.
+> Delegate to architect a proposed ADR for Firebase products and SQLite synchronization on Android, iOS, and Web. Use gpt-6-sol/medium. Compare practical options and define conflicts, retries, deletion, authorization, migrations, and verification. Do not implement, provision, or deploy. Return the proposed decision for my approval.
 
 Example safe team smoke check:
 
-> Use native architect (gpt-6-astra/high) to inspect ADR 0001 and native code_reviewer (gpt-6-sol/high) to independently inspect the team configuration. Each task is read-only, uses only relevant setup files, makes no edits, and returns concise findings. Wait for both and report actual models plus limitations.
+> Use native architect (gpt-6-sol/medium) to inspect ADR 0001 and native code_reviewer (gpt-6-sol/medium) to independently inspect the team configuration. Each task is read-only, uses only relevant setup files, makes no edits, and returns concise findings. Wait for both and report actual models plus limitations.
 
 ## Phase commands
 
@@ -58,3 +58,7 @@ The older PATH CLI did not load the proposed modern settings during the initial 
 The active chat's native spawn tool supports fresh-context model/effort overrides, but does not expose a custom-role selector and does not list gpt-5.6-terra as an override. The completed read-only demonstration used architect/reviewer settings with explicit role instructions. The native configuration reader separately verified all six role registrations and paths; an automatic custom-role spawn and QA model execution were not tested. QA remains configured as requested and must be validated in a newly loaded client exposing that role/model; do not silently replace it.
 
 Standalone CLI diagnostics from the sandbox reported unavailable auth/connectivity. This does not establish that the signed-in desktop is unauthenticated; no credential files were read or changed. No platform/application tests apply before an app exists. Worktree isolation requires a Git repository, which this setup does not create.
+
+## Model configuration update - 14 October 2026
+
+The user approved retaining the current configuration: primary Lead, tech_lead, architect, backend_developer, flutter_flame_developer and code_reviewer use gpt-6-sol/medium; qa_engineer remains gpt-5.6-terra/medium. The supervisor verifies these exact assignments and the project-local role paths. Earlier validation records describe the settings tested at that time, not this updated configuration.

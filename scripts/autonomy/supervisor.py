@@ -402,13 +402,13 @@ def cli_preflight(exe: str, root: Path) -> None:
         # scalar settings there (including enabled/max_concurrent_threads_per_session)
         # fail config loading. Multi-agent tools default to enabled. The project
         # instructions cap active delegates at three for those runtimes.
-        if (config.get("model") != "gpt-6-astra" or config.get("model_reasoning_effort") != "high"
+        if (config.get("model") != "gpt-6-sol" or config.get("model_reasoning_effort") != "medium"
             or not expected <= agents.keys()):
             raise GateError("Native team role configuration is incomplete or overridden")
         import tomllib
-        pairs = {"tech_lead": ("gpt-6-astra", "high"), "architect": ("gpt-6-astra", "high"),
+        pairs = {"tech_lead": ("gpt-6-sol", "medium"), "architect": ("gpt-6-sol", "medium"),
                  "backend_developer": ("gpt-6-sol", "medium"), "flutter_flame_developer": ("gpt-6-sol", "medium"),
-                 "qa_engineer": ("gpt-5.6-terra", "medium"), "code_reviewer": ("gpt-6-sol", "high")}
+                 "qa_engineer": ("gpt-5.6-terra", "medium"), "code_reviewer": ("gpt-6-sol", "medium")}
         for role, pair in pairs.items():
             path = (root / ".codex/agents" / (role + ".toml")).resolve()
             if Path(agents[role].get("config_file", "")).resolve() != path:
