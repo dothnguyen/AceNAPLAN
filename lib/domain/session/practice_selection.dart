@@ -88,9 +88,13 @@ PracticeSelection selectPractice({
   }
 
   final eligible = all.where((candidate) {
-    if (reservedItemIds.contains(candidate.itemId)) return false;
+    if (reservedItemIds.contains(candidate.itemId)) {
+      return false;
+    }
     if (exposedItemIds.contains(candidate.itemId) !=
-        (mode == PracticeMode.review)) return false;
+        (mode == PracticeMode.review)) {
+      return false;
+    }
     if (topicMode) {
       return candidate.topic == topic &&
           topicFamilyIds!.contains(candidate.familyId);
@@ -169,9 +173,13 @@ PracticeSelection selectPractice({
         }
         for (var index = 0; index < selected.length && !improved; index++) {
           final old = selected[index];
-          if (old.domain != domain) continue;
+          if (old.domain != domain) {
+            continue;
+          }
           for (final replacement in byKey[keyOf(old)]!) {
-            if (replacement.familyId == old.familyId) continue;
+            if (replacement.familyId == old.familyId) {
+              continue;
+            }
             if (counts[old.familyId]! <= counts[replacement.familyId]! + 1) {
               continue;
             }
@@ -193,52 +201,195 @@ PracticeSelection selectPractice({
       selectedIds.length == precedingItemIds.length &&
       selectedIds.containsAll(precedingItemIds);
   if (selected.isNotEmpty && repeats()) {
-    for (final key in keys) {
-      for (final alternative in byKey[key]!) {
-        if (precedingItemIds.contains(alternative.itemId)) continue;
-        final indices = <int>[
-          for (var i = 0; i < selected.length; i++)
-            if (keyOf(selected[i]) == key) i,
-        ];
-        // Preserve the family mix if an exchange within the family exists.
-        indices.sort((a, b) {
-          final aMatch = selected[a].familyId == alternative.familyId ? 0 : 1;
-          final bMatch = selected[b].familyId == alternative.familyId ? 0 : 1;
-          return aMatch.compareTo(bMatch);
-        });
-        for (final index in indices) {
-          if (!topicMode && selected[index].familyId != alternative.familyId) {
-            final counts = <String, int>{};
-            final families = eligible
-                .where((item) => item.domain == alternative.domain)
-                .map((item) => item.familyId)
-                .toSet();
-            for (final family in families) {
-              counts[family] = 0;
-            }
-            for (var i = 0; i < selected.length; i++) {
-              if (i == index || selected[i].domain != alternative.domain)
-                continue;
-              counts[selected[i].familyId] =
-                  (counts[selected[i].familyId] ?? 0) + 1;
-            }
-            counts[alternative.familyId] =
-                (counts[alternative.familyId] ?? 0) + 1;
-            final values = counts.values.toList();
-            if (values.reduce((a, b) => a > b ? a : b) -
-                    values.reduce((a, b) => a < b ? a : b) >
-                1) {
-              continue;
-            }
+    // Candidates with the same bucket and family have the same effect on
+    // balance. Keep their first ranked representative for bounded repair.
+    final swaps = <_SelectionSwap>[];
+    final familiesByDomain = <QuestionDomain, Set<String>>{};
+    for (final item in eligible) {
+      (familiesByDomain[item.domain] ??= <String>{}).add(item.familyId);
+    }
+    for (var index = 0; index < selected.length; index++) {
+      final seenFamilies = <String>{};
+      for (final alternative in byKey[keyOf(selected[index])]!) {
+        if (precedingItemIds.contains(alternative.itemId) ||
+            !seenFamilies.add(alternative.familyId)) {
+          continue;
+        }
+        swaps.add(_SelectionSwap(index, alternative));
+      }
+    }
+
+    int spread(QuestionDomain domain, _SelectionSwap first,
+        [_SelectionSwap? second]) {
+      final counts = {
+        for (final family in familiesByDomain[domain]!) family: 0,
+      };
+      for (var index = 0; index < selected.length; index++) {
+        final item = index == first.index
+            ? first.alternative
+            : index == second?.index
+                ? second!.alternative
+                : selected[index];
+        if (item.domain == domain) {
+          counts[item.familyId] = counts[item.familyId]! + 1;
+        }
+      }
+      final values = counts.values;
+      var minimum = selected.length;
+      var maximum = 0;
+      for (final value in values) {
+        if (value < minimum) {
+          minimum = value;
+        }
+        if (value > maximum) {
+          maximum = value;
+        }
+      }
+      return maximum - minimum;
+    }
+
+    final allowedSpread = <QuestionDomain, int>{};
+    if (!topicMode) {
+      for (final domain in familiesByDomain.keys) {
+        final counts = {
+          for (final family in familiesByDomain[domain]!) family: 0,
+        };
+        for (final item in selected) {
+          if (item.domain == domain) {
+            counts[item.familyId] = counts[item.familyId]! + 1;
           }
-          selectedIds.remove(selected[index].itemId);
-          selected[index] = alternative;
-          selectedIds.add(alternative.itemId);
+        }
+        var minimum = selected.length;
+        var maximum = 0;
+        for (final value in counts.values) {
+          if (value < minimum) {
+            minimum = value;
+          }
+          if (value > maximum) {
+            maximum = value;
+          }
+        }
+        allowedSpread[domain] = maximum - minimum > 1 ? maximum - minimum : 1;
+      }
+    }
+
+    bool balanced(_SelectionSwap first, [_SelectionSwap? second]) =>
+        topicMode ||
+        spread(first.alternative.domain, first, second) <=
+            allowedSpread[first.alternative.domain]!;
+
+    void apply(_SelectionSwap swap) {
+      selectedIds.remove(selected[swap.index].itemId);
+      selected[swap.index] = swap.alternative;
+      selectedIds.add(swap.alternative.itemId);
+    }
+
+    for (final swap in swaps) {
+      if (balanced(swap)) {
+        apply(swap);
+        break;
+      }
+    }
+    if (repeats() && !topicMode) {
+      // A paired repair can move a family between two difficulty buckets.
+      // Only a swap touching the first swap's lost or gained family can
+      // repair a failed single swap.
+      final byOldFamily = <String, List<_SelectionSwap>>{};
+      final byNewFamily = <String, List<_SelectionSwap>>{};
+      for (final swap in swaps) {
+        final domain = swap.alternative.domain.name;
+        final old = selected[swap.index].familyId;
+        (byOldFamily['$domain/$old'] ??= []).add(swap);
+        (byNewFamily['$domain/${swap.alternative.familyId}'] ??= []).add(swap);
+      }
+      var repaired = false;
+      for (final first in swaps) {
+        final domain = first.alternative.domain.name;
+        final old = selected[first.index].familyId;
+        final partners = <_SelectionSwap>{
+          ...?byOldFamily['$domain/${first.alternative.familyId}'],
+          ...?byNewFamily['$domain/$old'],
+        };
+        for (final second in partners) {
+          if (first.index == second.index ||
+              first.alternative.itemId == second.alternative.itemId ||
+              !balanced(first, second)) {
+            continue;
+          }
+          apply(first);
+          apply(second);
+          repaired = true;
           break;
         }
-        if (!repeats()) break;
+        if (repaired) {
+          break;
+        }
       }
-      if (!repeats()) break;
+      if (!repaired) {
+        // More than two transfers can form a family cycle. Follow only
+        // families currently selected in this domain. Each selected slot
+        // contributes at most one representative per selected family.
+        final cycleByOldFamily = <String, List<_SelectionSwap>>{};
+        for (final swap in swaps) {
+          final domain = swap.alternative.domain.name;
+          if (!byOldFamily
+              .containsKey('$domain/${swap.alternative.familyId}')) {
+            continue;
+          }
+          final old = selected[swap.index].familyId;
+          (cycleByOldFamily['$domain/$old'] ??= []).add(swap);
+        }
+        List<_SelectionSwap>? cycle(
+          String start,
+          String current,
+          List<_SelectionSwap> path,
+          Set<int> usedIndices,
+          int limit,
+          String domain,
+        ) {
+          if (path.length >= limit) return null;
+          for (final next in cycleByOldFamily['$domain/$current'] ??
+              const <_SelectionSwap>[]) {
+            if (usedIndices.contains(next.index) ||
+                path.any((swap) =>
+                    swap.alternative.itemId == next.alternative.itemId)) {
+              continue;
+            }
+            final following = [...path, next];
+            if (next.alternative.familyId == start) {
+              return following;
+            }
+            final found = cycle(
+              start,
+              next.alternative.familyId,
+              following,
+              {...usedIndices, next.index},
+              limit,
+              domain,
+            );
+            if (found != null) return found;
+          }
+          return null;
+        }
+
+        for (final first in swaps) {
+          final domain = first.alternative.domain;
+          final limit = selected.where((item) => item.domain == domain).length;
+          final path = cycle(
+            selected[first.index].familyId,
+            first.alternative.familyId,
+            [first],
+            {first.index},
+            limit,
+            domain.name,
+          );
+          if (path == null) continue;
+          for (final swap in path) {
+            apply(swap);
+          }
+          break;
+        }
+      }
     }
   }
   return PracticeSelection(
@@ -247,6 +398,13 @@ PracticeSelection selectPractice({
     buckets: buckets,
     repeatsPrecedingSet: selected.isNotEmpty && repeats(),
   );
+}
+
+final class _SelectionSwap {
+  const _SelectionSwap(this.index, this.alternative);
+
+  final int index;
+  final SelectionCandidate alternative;
 }
 
 // Arithmetic stays below 2^53, so ranking agrees on Dart VM and Web.

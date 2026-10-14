@@ -138,6 +138,8 @@ void main() {
       precedingItemIds: first.items.map((e) => e.itemId).toSet(),
     );
     expect(second.repeatsPrecedingSet, isFalse);
+    expect(second.items.map((entry) => entry.itemId).toSet().length,
+        second.actualSize);
     expect(second.actualSize, 8);
     final unavoidable = selectPractice(
       candidates: first.items,
@@ -148,6 +150,53 @@ void main() {
       precedingItemIds: first.items.map((e) => e.itemId).toSet(),
     );
     expect(unavoidable.repeatsPrecedingSet, isTrue);
+  });
+
+  test('coordinated swaps avoid a repeat while keeping families balanced', () {
+    final source = [
+      item(
+          'a-i', QuestionDomain.numeracy, QuestionDifficulty.introductory, 'A'),
+      item(
+          'b-i', QuestionDomain.numeracy, QuestionDifficulty.introductory, 'B'),
+      item('z-i', QuestionDomain.numeracy, QuestionDifficulty.introductory, 'C',
+          revision: 2),
+      item('a-d', QuestionDomain.numeracy, QuestionDifficulty.developing, 'C'),
+      item('b-d', QuestionDomain.numeracy, QuestionDifficulty.developing, 'D'),
+      item('z-d', QuestionDomain.numeracy, QuestionDifficulty.developing, 'A',
+          revision: 3),
+    ];
+    PracticeSelection choose(
+            Iterable<SelectionCandidate> candidates, Set<String> preceding) =>
+        selectPractice(
+          candidates: candidates,
+          exposedItemIds: {},
+          reservedItemIds: {},
+          mode: PracticeMode.fresh,
+          seed: 1,
+          precedingItemIds: preceding,
+        );
+
+    final first = choose(source, {});
+    final preceding = first.items.map((entry) => entry.itemId).toSet();
+    expect(preceding, {'a-i', 'b-i', 'a-d', 'b-d'});
+    final second = choose(source, preceding);
+    expect(second.items.map((entry) => entry.itemId).toSet(),
+        {'z-i', 'b-i', 'z-d', 'b-d'});
+    expect(second.repeatsPrecedingSet, isFalse);
+    expect(second.shortfall, 4);
+    expect(second.items.map((entry) => entry.familyId).toSet(),
+        {'A', 'B', 'C', 'D'});
+    expect(
+        second.items.firstWhere((entry) => entry.itemId == 'z-i').revision, 2);
+    expect(
+        second.items.firstWhere((entry) => entry.itemId == 'z-d').revision, 3);
+    expect(
+        choose(source.reversed, preceding).items.map((entry) => entry.itemId),
+        second.items.map((entry) => entry.itemId));
+
+    final exhausted = choose(first.items, preceding);
+    expect(exhausted.repeatsPrecedingSet, isTrue);
+    expect(exhausted.items.map((entry) => entry.itemId).toSet(), preceding);
   });
 
   test('mixed selection balances families across difficulty buckets', () {
