@@ -235,7 +235,7 @@ AnswerRule _decodeRule(Object? raw) {
 List<QuestionAsset> _assets(Object? raw) {
   if (raw is! List) throw const FormatException('Invalid assets.');
   try {
-    return raw.map((value) {
+    final assets = raw.map((value) {
       final map = _object(value);
       _fields(map, const {'id', 'digest', 'description'});
       return QuestionAsset(
@@ -243,6 +243,10 @@ List<QuestionAsset> _assets(Object? raw) {
           digest: _string(map, 'digest'),
           description: _string(map, 'description'));
     }).toList();
+    if (assets.map((asset) => asset.id).toSet().length != assets.length) {
+      throw const FormatException('Duplicate asset ID.');
+    }
+    return assets;
   } on ArgumentError {
     throw const FormatException('Invalid assets.');
   }

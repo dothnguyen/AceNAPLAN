@@ -170,5 +170,10 @@ void main() {
     expect(() => codec.decodeAssets('[{"id":"x"}]'),
         throwsA(isA<FormatException>()));
     expect(() => codec.decodeAssets('{'), throwsA(isA<FormatException>()));
+    expect(
+      () => codec.decodeAssets('[{"id":"x","digest":"a","description":"one"},'
+          '{"id":"x","digest":"b","description":"two"}]'),
+      throwsA(isA<FormatException>()),
+    );
   });
 }
