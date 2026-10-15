@@ -1,8 +1,4 @@
-"""Entry point for the pilot's opaque checks.
-
-Gate-specific semantic validators are not installed yet. An evidence envelope
-alone cannot prove a check passed, so every supported gate currently fails.
-"""
+"""Entry point for the pilot's fixed, opaque checks."""
 
 from __future__ import annotations
 
@@ -11,6 +7,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from content_gate import ContentGateError, validate_content_gate
 from evidence import EvidenceError
 from gate_context import GATE_CHECKS, validate_gate_context
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "autonomy"))
@@ -30,14 +27,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--gate must be supplied exactly once")
     gate = arguments.gate[0]
 
+    workspace = Path(__file__).resolve().parents[2]
     try:
-        validate_gate_context(gate, workspace=Path(__file__).resolve().parents[2])
-    except (EvidenceError, core.GateError, OSError, ValueError, KeyError, TypeError) as error:
+        validate_gate_context(gate, workspace=workspace)
+        if gate == "content":
+            validate_content_gate(workspace=workspace, snapshot=core.snapshot(workspace))
+    except (EvidenceError, ContentGateError, core.GateError, OSError, ValueError,
+            KeyError, TypeError) as error:
         print(f"PILOT gate {gate} cannot pass: semantic validator unavailable; {error}",
               file=sys.stderr)
         return 1
 
-    # Envelope integrity is only a prerequisite; no semantic validators exist.
+    if gate == "content":
+        return 0
+    # Envelope integrity is only a prerequisite for all other gates.
     print(
         f"PILOT gate {gate} cannot pass: semantic validator and "
         "genuine gate evidence are not implemented",
