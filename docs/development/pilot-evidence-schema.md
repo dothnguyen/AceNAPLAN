@@ -46,3 +46,41 @@ The CLI maps each approved name to one check ID and one fixed envelope path unde
 | `release_candidate` | `PILOT-RELEASE-CANDIDATE` | `gates/release_candidate.json` |
 
 `gate_context.py` reads the approved pilot board and checks its scope and contract hashes, the frozen CLI commands, approved branch, and clean current Git source snapshot. It reads only the fixed envelope for the selected gate and confines artifact references to `.autonomy/evidence/pilot/`. Missing, stale, malformed, or tampered records fail. The CLI accepts no caller-selected path or root. Even when all integrity checks succeed, the gate remains nonzero until a separate semantic validator verifies the actual check outcome.
+
+## Platform observation structure (PILOT-T11D)
+
+`platform_claims.py` provides pure structural checks for `browser`, `android_integration`, `physical_phone`, and `physical_tablet` observations. A caller supplies the trusted current `expected_snapshot` and an artifact path-to-digest map only after validating the enclosing envelope and artifact bytes. The observation has exactly these fields:
+
+```json
+{
+  "run": {
+    "id": "unique-executed-run-id",
+    "started_at": "2026-10-15T01:00:00Z",
+    "ended_at": "2026-10-15T01:01:00Z",
+    "command": "actual execution command or procedure",
+    "build_id": "build-id",
+    "target_device_id": "observed-device-id",
+    "log_artifact": "relative/path/to/run.log"
+  },
+  "source": {"head": "40 lowercase hex characters", "source_sha256": "64 lowercase hex characters"},
+  "build": {"id": "build-id", "sha256": "64 lowercase hex characters", "artifact": "relative/path/to/build"},
+  "target": {"platform": "android", "kind": "physical", "device_id": "observed-device-id", "form_factor": "phone"},
+  "adapter": "sqlite",
+  "flows": [
+    {"name": "offline_practice", "outcome": "passed", "artifact": "relative/path/to/flow.log"},
+    {"name": "audio", "outcome": "passed", "artifact": "relative/path/to/audio.log"},
+    {"name": "accessibility", "outcome": "passed", "artifact": "relative/path/to/accessibility.log"}
+  ]
+}
+```
+
+All fields are required and extras rejected. Run IDs need at least eight characters, timezone-aware start/end times must have positive elapsed time, and each run and flow references an envelope artifact. The run's build and target IDs must match the described build and target. Source must match the trusted current snapshot; build SHA-256 must match its envelope artifact digest. The caller must establish that the artifact is the executable actually run. A build command or build artifact alone is never a browser flow result.
+
+| Gate | Required target and adapter | Required passed flows |
+| --- | --- | --- |
+| `browser` | `web` / `browser` / `browser` / `memory` | `practice`, `feedback`, `summary` |
+| `android_integration` | `android` / `emulator` or `physical` / `phone` or `tablet` / `sqlite` | `sqlite_save_restart`, `migration`, `offline_practice` |
+| `physical_phone` | `android` / `physical` / `phone` / `sqlite` | `offline_practice`, `audio`, `accessibility` |
+| `physical_tablet` | `android` / `physical` / `tablet` / `sqlite` | `offline_practice`, `audio`, `accessibility` |
+
+The four target values are platform, kind, form factor, and adapter. Flow names must match the gate's set exactly, with one passed result per flow and a referenced artifact for each. Physical phone and tablet observations also require distinct run IDs and device IDs through `validate_physical_pair`; the pair check follows individual validation. A locally editable JSON record, log or device ID cannot authenticate a human, prove hardware identity, or prove a flow was truly executed. A future gate implementation must independently verify run/build provenance, actual behavior and device identity. These synthetic schema regressions establish only rejection rules; `pilot_gate.py` still returns nonzero for every opaque gate.
