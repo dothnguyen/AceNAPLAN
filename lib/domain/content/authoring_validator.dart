@@ -49,6 +49,9 @@ List<String> validateAuthoredItems({
     if (family['domain'] != item.domain.name || family['topic'] != item.topic) {
       issues.add('Family domain or topic mismatch for $label');
     }
+    if (item.contentSchemaVersion != catalogue['schema_version']) {
+      issues.add('Unsupported content schema for $label');
+    }
     final difficulties = family['difficulty_targets'];
     if (difficulties is! Map ||
         difficulties[item.difficulty.name] is! int ||

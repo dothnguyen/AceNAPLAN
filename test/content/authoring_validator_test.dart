@@ -15,6 +15,7 @@ QuestionRevision item({
   String family = 'N-PV-01',
   String variant = 'whole_number',
   int revision = 1,
+  int schemaVersion = 1,
   String topic = 'place_value',
   QuestionDomain domain = QuestionDomain.numeracy,
   QuestionDifficulty difficulty = QuestionDifficulty.introductory,
@@ -26,7 +27,7 @@ QuestionRevision item({
       variantId: variant,
       familyId: family,
       revision: revision,
-      contentSchemaVersion: 1,
+      contentSchemaVersion: schemaVersion,
       bankVersion: 'draft-fixture-1',
       topic: topic,
       domain: domain,
@@ -52,6 +53,14 @@ void main() {
     expect(
         validateAuthoredItems(items: items, catalogue: catalogue()), isEmpty);
     expect(catalogue()['release_bank'], false);
+  });
+
+  test('rejects a future content schema against the approved catalogue', () {
+    final issues = validateAuthoredItems(
+      items: [item(schemaVersion: 999)],
+      catalogue: catalogue(),
+    );
+    expect(issues, contains(contains('Unsupported content schema')));
   });
 
   test('rejects duplicate revision and unstable family or variant identity',
