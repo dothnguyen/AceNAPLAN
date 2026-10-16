@@ -17,8 +17,10 @@ final class UnsupportedSqliteSchema implements Exception {
 /// Opens Android app-private SQLite storage. Supply an isolated filename in
 /// tests; production composition must supply its own stable filename.
 ///
-/// This establishes schema v1 only. Approved-content import, later migrations,
-/// session recovery and reset belong to later repository work.
+/// Only schema v1 is supported. No older-schema migration is implemented;
+/// a newer version fails closed without deleting the existing database.
+/// Approved-content import, later migrations, session recovery and reset
+/// belong to later repository work.
 Future<Database> openPilotSqliteDatabase({required String path}) async {
   if (path.trim().isEmpty || !p.isAbsolute(path)) {
     throw ArgumentError.value(path, 'path', 'Use an absolute database path.');

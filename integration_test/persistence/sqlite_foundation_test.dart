@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ace_naplan5/infrastructure/persistence/sqlite_database.dart';
 import 'package:ace_naplan5/infrastructure/persistence/sqlite_schema.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +10,7 @@ import 'package:sqflite/sqflite.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Android isolated schema, constraints, rollback and reopen',
+  testWidgets('Android isolated v1 schema, constraints and future rejection',
       (tester) async {
     final path = p.join(await getDatabasesPath(),
         'sqlite_foundation_${DateTime.now().microsecondsSinceEpoch}.db');
@@ -185,6 +187,7 @@ void main() {
       await db.setVersion(sqliteSchemaVersion + 1);
       await db.close();
       db = null;
+      final futureVersionBytes = await File(path).readAsBytes();
       await expectLater(
         openPilotSqliteDatabase(path: path),
         throwsA(isA<UnsupportedSqliteSchema>().having(
@@ -193,12 +196,50 @@ void main() {
           sqliteSchemaVersion + 1,
         )),
       );
+      expect(await File(path).readAsBytes(), orderedEquals(futureVersionBytes));
       db = await openDatabase(path, version: sqliteSchemaVersion + 1);
       expect(await db.getVersion(), sqliteSchemaVersion + 1);
+      expect(
+        await db.query('practice_session',
+            columns: ['learner_key', 'session_id'],
+            where: 'session_id = ?',
+            whereArgs: ['session-1']),
+        [
+          {'learner_key': 'local-learner', 'session_id': 'session-1'}
+        ],
+      );
+      expect(
+        await db.query('attempt',
+            columns: ['attempt_id', 'submission_key', 'normalized_response'],
+            where: 'attempt_id = ?',
+            whereArgs: ['attempt-1']),
+        [
+          {
+            'attempt_id': 'attempt-1',
+            'submission_key': 'submit-1',
+            'normalized_response': 'a',
+          }
+        ],
+      );
+
+      // This synthetic database has always contained schema v1. Restore only
+      // its version marker to prove supported v1 reopen; this is no migration.
+      await db.setVersion(sqliteSchemaVersion);
+      await db.close();
+      db = await openPilotSqliteDatabase(path: path);
+      expect(await db.getVersion(), sqliteSchemaVersion);
       expect(
           Sqflite.firstIntValue(
               await db.rawQuery('SELECT COUNT(*) FROM attempt')),
           1);
+      expect(
+        (await db.query('practice_session',
+                columns: ['learner_key'],
+                where: 'session_id = ?',
+                whereArgs: ['session-1']))
+            .single['learner_key'],
+        'local-learner',
+      );
     } finally {
       await db?.close();
       await deleteDatabase(path); // Only this uniquely named synthetic test DB.
