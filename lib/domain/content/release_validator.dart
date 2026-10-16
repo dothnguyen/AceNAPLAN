@@ -182,12 +182,16 @@ List<String> validateReleaseContent({
           }
         }
         if (bound.length != fields.length) continue;
-        final signature = fields.map((field) => bound[field]!).join('\u001f');
+        final signature = fields
+            .map(
+                (field) => _variationSignatureValue(item, field, bound[field]!))
+            .join('\u001f');
         if (!signatures.add(signature)) {
           issues.add('Trivially repeated variation in $familyId');
         }
         for (final field in fields) {
-          distinct[field]!.add(bound[field]!);
+          distinct[field]!
+              .add(_variationSignatureValue(item, field, bound[field]!));
         }
       }
       if (distinct.values.any((values) => values.length < 2)) {
@@ -218,6 +222,26 @@ final _digestPattern = RegExp(r'^[a-fA-F0-9]{64}$');
 
 String _normalizeVariation(String value) =>
     value.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
+final _dictationWord = RegExp(r"[A-Za-z]+(?:['’\-][A-Za-z]+)*");
+
+/// The full transcript remains the declared, reviewed context. Only the
+/// uniqueness comparison removes the dictated word from its middle sentence.
+String _variationSignatureValue(
+    QuestionRevision item, String field, String bound) {
+  if (item.familyId != 'C-SP-01' || field != 'context') return bound;
+  final rule = item.answerRule;
+  if (rule is! SpellingRule ||
+      !isValidDictationTranscript(transcript: bound, targetWord: rule.target)) {
+    return bound;
+  }
+  final sentence = bound.split(RegExp(r'[.!?]+'))[1].trim();
+  final target = rule.target.trim().toLowerCase();
+  return sentence.replaceAllMapped(_dictationWord, (match) {
+    final word = match.group(0)!;
+    return word.toLowerCase() == target ? '<target>' : word;
+  });
+}
 
 /// Only exact, family-specific bindings count. A word appearing somewhere in a
 /// prompt cannot prove an operation, relationship, scale or visual meaning.

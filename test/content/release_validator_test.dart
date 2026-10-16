@@ -411,6 +411,149 @@ void main() {
         contains(contains('accessible correction')));
   });
 
+  test('dictation context variation requires changes beyond the target word',
+      () {
+    const words = [
+      'apple',
+      'beach',
+      'cloud',
+      'dance',
+      'eagle',
+      'flame',
+      'grape',
+      'house',
+      'island',
+      'jungle',
+      'koala',
+      'lemon',
+      'mouse',
+      'night',
+      'ocean',
+      'pencil',
+      'quiet',
+      'river',
+      'stone',
+      'tiger',
+    ];
+    const places = [
+      'garden',
+      'library',
+      'classroom',
+      'kitchen',
+      'hallway',
+      'bedroom',
+      'museum',
+      'station',
+      'market',
+      'forest',
+      'valley',
+      'playground',
+      'courtyard',
+      'theatre',
+      'gallery',
+      'harbour',
+      'cottage',
+      'village',
+      'workshop',
+      'orchard',
+    ];
+    final bytes = _wave();
+    final digest = sha256Hex(bytes);
+    final correction = _item('correction', 'C-SP-02', []);
+
+    List<String> check({required bool distinctContexts}) {
+      final dictations = <QuestionRevision>[];
+      final bundledBytes = <String, Uint8List>{};
+      final assetManifest = <String, dynamic>{};
+      final audioReviews = <String, dynamic>{};
+      final variationValues = <String, Map<String, String>>{};
+      final alternatives = <String, dynamic>{};
+      for (var i = 0; i < words.length; i++) {
+        final id = 'dictation-$i';
+        final assetId = 'audio-$i';
+        final word = words[i];
+        final transcript = '$word. Please write $word in the '
+            '${distinctContexts ? places[i] : 'book'}. $word.';
+        final draft = _copy(
+          _item(id, 'C-SP-01', [
+            QuestionAsset(id: assetId, digest: digest, description: 'Recording')
+          ]),
+          answerRule: SpellingRule(target: word, scoringPolicyVersion: 1),
+        );
+        final item =
+            _copy(draft, contentDigest: canonicalQuestionDigest(draft));
+        dictations.add(item);
+        final path = 'assets/$assetId.wav';
+        bundledBytes[path] = bytes;
+        assetManifest[assetId] = {
+          'path': path,
+          'digest': digest,
+          'kind': 'audio'
+        };
+        audioReviews[assetId] = {
+          'id': assetId,
+          'item_id': id,
+          'digest': digest,
+          'status': 'approved',
+          'reviewer': 'Synthetic fixture',
+          'reviewed_at': '2026-01-01',
+          'target_word': word,
+          'transcript': transcript,
+          'provenance': 'Synthetic fixture',
+          'rights': 'Synthetic fixture',
+        };
+        variationValues[id] = {
+          'target_word': word,
+          'context': transcript,
+        };
+        alternatives[id] = correction.itemId;
+      }
+      final items = [...dictations, correction];
+      final itemReviews = {
+        for (final item in items)
+          item.reviewRecordId: {
+            'id': item.itemId,
+            'revision': item.revision,
+            'digest': item.contentDigest,
+            'status': 'approved',
+            'reviewer': 'Synthetic fixture',
+            'reviewed_at': '2026-01-01',
+          }
+      };
+      return validateReleaseContent(
+        items: items,
+        catalogue: {
+          'release_bank': true,
+          'status': 'release_approved',
+          'families': [
+            {
+              'id': 'C-SP-01',
+              'variation_fields': ['target_word', 'context'],
+            }
+          ],
+        },
+        bundledBytes: bundledBytes,
+        assetManifest: assetManifest,
+        itemReviews: itemReviews,
+        audioReviews: audioReviews,
+        dictationAlternatives: alternatives,
+        variationValues: variationValues,
+      );
+    }
+
+    final renamed = check(distinctContexts: false);
+    expect(renamed, contains(contains('Insufficient declared variation')));
+    expect(
+        renamed, isNot(contains(contains('context does not match content'))));
+    expect(renamed, isNot(contains(contains('transcript or target mismatch'))));
+
+    final varied = check(distinctContexts: true);
+    expect(
+        varied, isNot(contains(contains('Insufficient declared variation'))));
+    expect(varied, isNot(contains(contains('Trivially repeated variation'))));
+    expect(varied, isNot(contains(contains('context does not match content'))));
+  });
+
   test('identical declared parameters are rejected even with different prompts',
       () {
     final one = _item('one', 'C-SP-02', []);
