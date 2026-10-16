@@ -143,6 +143,16 @@ void main() {
     final changed = question('changed', 2, revision: 2, digest: 'changed-r2');
     final added = question('added', 2, digest: 'added-r1');
     Database? db;
+    late final List<Map<String, Object?>> originalAttempts;
+    late final List<Map<String, Object?>> originalSessions;
+
+    Future<void> expectLearnerRowsUnchanged() async {
+      final database = db!;
+      expect(await database.query('attempt', orderBy: 'attempt_id'),
+          originalAttempts);
+      expect(await database.query('practice_session', orderBy: 'session_id'),
+          originalSessions);
+    }
 
     Future<List<Map<String, Object?>>> activeItems() => db!.rawQuery('''
       SELECT bi.item_id, bi.revision
@@ -154,6 +164,7 @@ void main() {
 
     Future<void> expectOldState() async {
       final database = db!;
+      await expectLearnerRowsUnchanged();
       expect(await activeItems(), [
         {'item_id': 'changed', 'revision': 1},
         {'item_id': 'retired', 'revision': 1},
@@ -172,6 +183,7 @@ void main() {
 
     Future<void> expectUpdatedState() async {
       final database = db!;
+      await expectLearnerRowsUnchanged();
       expect(await activeItems(), [
         {'item_id': 'added', 'revision': 1},
         {'item_id': 'changed', 'revision': 2},
@@ -272,6 +284,11 @@ void main() {
           'revision': 1,
         });
       }
+      // Compare every persisted learner column, including response, submission
+      // identity, scoring flags, session status, sizes, and timestamps.
+      originalAttempts = await db.query('attempt', orderBy: 'attempt_id');
+      originalSessions =
+          await db.query('practice_session', orderBy: 'session_id');
       await expectOldState();
 
       await expectLater(
